@@ -12,49 +12,41 @@ typedef struct Node {
 } Node;
 
 void printNode(Node* node) {
-    printf("Character: %c, Occurence: %d\n", node->box.name, node->box.freq);
+  if (!node) return;
+  printf("Character: %c, Occurence: %d\n", node->box.name, node->box.freq);
+  printNode(node->next);
 }
 
-Node* AddChar(Node* node, char name) {
+int LenghtList(Node* node) {
+  if (!node) return 0;
+  return LenghtList(node->next)+1;
+}
+
+void AddChar(Node* node, char name) {
   if (node != NULL) {
-
-    printf("char in node %c occ : %d\n", node->box.name, node->box.freq);
-
-    if (node->box.name == name) {
-      node->box.freq ++;
-      printf("Node occ ++\n");
-      return node;
-    }
-
+    
+    if (node->box.name == name) node->box.freq ++;
+    
     else {
       if (node->next == NULL) {
-        printf("New node created\n");
-        Box tmpBox_v;
-        tmpBox_v.name = name;
-        tmpBox_v.freq = 1;
 
-        Node tmpNode_v;
-        tmpNode_v.box = tmpBox_v;
-        tmpNode_v.next = NULL;
-        
-        node->next = malloc(sizeof(*node->next));
-        node->next = &tmpNode_v;
-        printf("char : %c occ : %d\n",node->next->box.name, node->next->box.freq);
-        return node;
-      }
-      else {
-        printf("go to the next node %c \n", node->next->box.name);
-        node->next = AddChar(node->next, name);
-      }
+        Node* new = malloc(sizeof(*new));
+
+        if (!node || !new) exit(EXIT_FAILURE);
+
+        new->box.name = name;
+        new->box.freq = 1;
+
+        node->next = new;    
+
+      } else AddChar(node->next, name);
     }
   }
-  return node;
 }
 
 int main(int argc, char const *argv[]) {
   FILE* file = NULL;
-  file = fopen("test.txt", "r");
-
+  file = fopen("test.txt","r");
   if (file != NULL) {
 
     fseek(file,0,SEEK_SET); //set cursor to the beginning
@@ -70,14 +62,12 @@ int main(int argc, char const *argv[]) {
     Node* node = &node_v;
 
     while(buffer != EOF){
-      printf("on place : %c\n", buffer );
-      node = AddChar(node, buffer);
+      AddChar(node, buffer);
       buffer = fgetc(file);
     }
     fclose(file);
     printNode(node);
-    printNode(node->next);
-    printNode(node->next->next);
+    printf("lenght : %d\n", LenghtList(node));
   }
   else printf("Error : file not found\n");
 
