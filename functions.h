@@ -9,8 +9,10 @@ int LenghtList(Node* node);
 
 void Split(Node* node, Node** A, Node** B);
 
-Node* FSort(Node* node);
+Node* MergeSort(Node* node);
 
 void AddChar(Node* node, char name);
+
+Node* MakeTree(Node* node);
 
 #endif

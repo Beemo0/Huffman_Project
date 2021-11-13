@@ -14,6 +14,8 @@ int main(int argc, char const *argv[]) {
 		node_v.box.name = buffer;
 		node_v.box.freq = 0;
 		node_v.next = NULL;
+		node_v.son_l = NULL;
+		node_v.son_r = NULL;
 
 		Node* node = &node_v;
 
@@ -22,9 +24,12 @@ int main(int argc, char const *argv[]) {
 			buffer = fgetc(file);
 		}
 		fclose(file);
-		FSort(node);
+		MergeSort(node);
 		printNode(node);
-	
+
+		node = MakeTree(node);
+		printNode(node);
+
 	} else printf("Error : file not found\n");
 
 	return 0;
