@@ -6,5 +6,6 @@
 #include <time.h>
 #include "struct.h"
 #include "functions.h"
+#include <string.h>
 
 #endif

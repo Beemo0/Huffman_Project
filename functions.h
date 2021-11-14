@@ -15,4 +15,10 @@ void AddChar(Node* node, char name);
 
 Node* MakeTree(Node* node);
 
+void ReadTree(Node* node, Node* root, int buffer);
+
+void treeprint(Node* root, int level);
+
+int tree_height(Node* root);
+
 #endif

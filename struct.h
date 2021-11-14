@@ -8,11 +8,24 @@ typedef struct Box {
 	int freq;
 } Box;
 
+typedef struct Table {
+	char name;
+	int code;
+	struct Table* next;
+} Table;
+
+typedef struct Way {
+	int value;
+	struct Way* next;
+} Way;
+
 typedef struct Node {
 	Box box;
 	struct Node* next;
-	struct Node* son_l;
-	struct Node* son_r;
+	struct Node* left;
+	struct Node* right;
+	int isLeaf;
+	Way* way;
 } Node;
 
 #endif
