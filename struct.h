@@ -2,6 +2,7 @@
 #define STRUCT
 
 #include "main.h"
+#define llui long long unsigned int
 
 typedef struct Box {
 	char name;
@@ -10,7 +11,7 @@ typedef struct Box {
 
 typedef struct Table {
 	char name;
-	int code;
+	llui code;
 	struct Table* next;
 } Table;
 

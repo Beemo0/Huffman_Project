@@ -6,6 +6,12 @@ void printNode(Node* node) {
 	printNode(node->next);
 }
 
+void printTable(Table* table) {
+	if (!table) return;
+	printf("Character: %c, Code: %llu\n", table->name,  table->code);
+	printTable(table->next);
+}
+
 int LenghtList(Node* node) {
 	if (!node) return 0;
 	return LenghtList(node->next)+1;
@@ -131,7 +137,7 @@ Node* MakeTree(Node* node) {
 
 /* internet inspired function */
 llui Concatenate(llui x, llui y) {
-    int pow = 10;
+    llui pow = 10;
     while(y >= pow)
         pow *= 10;
     return x * pow + y;        
@@ -174,52 +180,156 @@ int tree_height(Node* node) {
     }
 }
 
-void ReadTree(Node* node, Node* root,llui buffer) {
-
-	printf("read node number : %d\n", node->box.freq);
-	FILE* out = NULL;
-
-	int again = 0;
+void ReadTree(Node* node, Node* root, llui buffer, Table** table) {
 
 	if (node->left != NULL) {
 		if (node->left->left == NULL && node->left->right == NULL && node->left->isLeaf == 0) {
 			node->left = NULL;
-			if (root->left != NULL || root->right != NULL) ReadTree(root, root, 0);
+			if (root->left != NULL || root->right != NULL) ReadTree(root, root, 0, table);
 		
 		} else if (node->left->isLeaf == 1) {
 			buffer = Concatenate(buffer,2);
-			out = fopen("out.txt","r+");
-			fseek(out,0,SEEK_END);
-			fprintf(out, "char : %c, code : %llu\n",node->left->box.name, buffer );
-			printf("char : %c, code : %llu\n",node->left->box.name, buffer);
-			fclose(out);
+			*table = AddCharTable(*table,node->left->box.name, buffer);
 			node->left = NULL;
-			if (root->left != NULL || root->right != NULL) ReadTree(root, root, 0);
+			if (root->left != NULL || root->right != NULL) ReadTree(root, root, 0, table);
 		}
 	}
 
 	if (node->right != NULL) {
 		if (node->right->left == NULL && node->right->right == NULL && node->right->isLeaf == 0) {
 			node->right = NULL;
-			if (root->left != NULL || root->right != NULL) ReadTree(root, root, 0);
+			if (root->left != NULL || root->right != NULL) ReadTree(root, root, 0, table);
 		
 		} else if (node->right->isLeaf == 1) {
 			buffer = Concatenate(buffer,1);
-			out = fopen("out.txt","r+");
-			fseek(out,0,SEEK_END);
-			fprintf(out, "char : %c, code : %llu\n",node->right->box.name, buffer );
-			printf("char : %c, code : %llu\n",node->right->box.name, buffer);
-			fclose(out);
+			*table = AddCharTable(*table,node->right->box.name, buffer);
 			node->right = NULL;
-			if (root->left != NULL || root->right != NULL) ReadTree(root, root, 0);
+			if (root->left != NULL || root->right != NULL) ReadTree(root, root, 0, table);
 
 		}
 	}
 	if (node->left != NULL) {
 		buffer = Concatenate(buffer,2);
-		ReadTree(node->left,root,buffer);
+		ReadTree(node->left,root,buffer, table);
 	} else if (node->right != NULL) {
 		buffer = Concatenate(buffer,1);
-		ReadTree(node->right,root,buffer);
+		ReadTree(node->right,root,buffer, table);
 	}
 }
+
+Table* AddCharTable(Table* table, char name, llui code) {
+
+	Table* new = malloc(sizeof(*new));
+
+	new->name = name;
+	new->code = code;
+	new->next = table;
+
+	return new;
+}
+
+Node* FillList(Node* node, char* filename) {
+	
+	FILE* file = NULL;
+	file = fopen(filename,"r");
+
+	if (file != NULL) {
+
+		fseek(file,0,SEEK_SET); //set cursor to the beginning
+
+		char buffer;
+		buffer = fgetc(file); //get the first char
+
+		node->box.name = buffer;
+		node->box.freq = 0;
+		node->next = NULL;
+		node->isLeaf = 1;
+		node->left = NULL;
+		node->right = NULL;
+
+
+		while(buffer != EOF){
+			AddChar(node, buffer);
+			buffer = fgetc(file);
+		}
+
+		fclose(file);
+
+		return node;
+		
+	} else printf("Error : file not found\n");
+}
+
+void ReplaceText(char* filename, Table* table) {
+
+	FILE* inFile = fopen(filename, "r");
+	FILE* outFile = fopen("out", "w");
+
+	if (!inFile || !outFile) exit(1);
+	
+	fseek(inFile,0,SEEK_SET);
+	fseek(outFile,0,SEEK_SET);
+
+	char buffer = fgetc(inFile);
+
+	while (buffer != EOF) {
+		fprintf(outFile, "%llu ", Encode(buffer,table) );
+		buffer = fgetc(inFile);
+	}
+
+	fclose(inFile);
+	fclose(outFile);
+}
+
+void Replace2(char* filename) {
+
+	FILE* file = fopen(filename, "r+");
+
+}
+
+/* internet function */
+llui replace(llui number){
+   if (number == 0)
+   return 0;
+   //check last digit and change it if needed
+   llui digit = number % 10;
+   if (digit == 2)
+   digit = 0;
+   // Convert remaining digits and append to its last digit
+   return replace(number/10) * 10 + digit;
+}
+
+llui Encode(char name, Table* table) {
+	
+
+	while(name != table->name) {
+		table = table->next;
+		if (!table) exit(EXIT_FAILURE);
+	}
+
+	llui result = replace(table->code);
+
+
+	return result;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

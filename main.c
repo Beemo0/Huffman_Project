@@ -1,53 +1,27 @@
 #include "main.h"
 
 int main(int argc, char const *argv[]) {
-	FILE* file = NULL;
-	file = fopen("h2g2.txt","r");
-
-
-	char in[50] = "freq : ";
-	char out[50] = "0";
-
-
-	printf("strcat test : %s\n",strcat(in, out));
-
-	if (file != NULL) {
-
-		fseek(file,0,SEEK_SET); //set cursor to the beginning
-
-		char buffer;
-		buffer = fgetc(file); //get the first char
 
 		Node node_v;
-		node_v.box.name = buffer;
-		node_v.box.freq = 0;
-		node_v.next = NULL;
-		node_v.isLeaf = 1;
-		node_v.left = NULL;
-		node_v.right = NULL;
-
 		Node* node = &node_v;
 
-		while(buffer != EOF){
-			AddChar(node, buffer);
-			buffer = fgetc(file);
-		}
-		fclose(file);
+		node = FillList(node, "h2g2.txt");
+
+		Table* table = NULL;
+		Table** table_p = &table;
+		
 		node = MergeSort(node);
-		printNode(node);
+		//printNode(node);
 
 		node = MakeTree(node);
-		printf("main debug 1 \n");
-		printNode(node);
-		printf("le a c'est : %c\n",node->left->box.name);
-		treeprint(node, 0);
+		//printNode(node);
 
-		ReadTree(node,node, 0);
-		int level = tree_height(node);
-		treeprint(node, 0);
+		ReadTree(node,node, 0, table_p);
+		printTable(table);
 		
+		ReplaceText("h2g2.txt", table);
 
-	} else printf("Error : file not found\n");
+	
 
 	return 0;
 }
