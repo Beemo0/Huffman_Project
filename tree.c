@@ -1,28 +1,79 @@
 #include "tree.h"
 
 /**
- * @brief Function to initialise a new node with a value
- *
- * @param value
- * @return Tree*
+ * @brief Initialise a node with a character and it's occurences
+ * 
+ * @param character 
+ * @param occurence 
+ * @return Tree* 
  */
-Tree* init(char character, int occurence){
+Tree* init(char character, unsigned int occurence){
 
+    /*Allocate memory for a new node*/
     Tree* tmp = NULL;
-    tmp = malloc(sizeof(Tree*));
+    tmp = (Tree*)malloc(sizeof(Tree));
 
     if (!tmp){
-        printf("Error: Can't allocate memory\n");
+        perror("Error: Can't allocate memory\n");
         exit(1);
     }
 
-    /*Initialise value*/
+    /*Initialisation value*/
     tmp->character = character;
-    tmp->occurence = occurence;
+    //tmp->code = NULL;
+
+    if(occurence >= 0)
+        tmp->occurence = occurence;
+    else {
+        perror("Error: Occurence negative in tree init");
+        exit(1);
+    }
+
     tmp->left = NULL;
     tmp->right = NULL;
 
     return tmp;
+}
+
+void makeBinary(Tree** tree)
+{
+    if (*tree == NULL)
+        return;
+    
+    if ((*tree)->left != NULL)
+        makeBinaryHide(&((*tree)->left), NULL, 0);
+
+    if ((*tree)->right != NULL)
+        makeBinaryHide(&((*tree)->right), NULL, 1);
+}
+
+void makeBinaryHide(Tree** tree, ListBinary* code, short binary)
+{
+    if (*tree == NULL)
+        return;
+    
+    if (binary != 0 && binary != 1)
+    {
+        perror("Error: in makeBinaryHide: value not binary\n");
+        exit(1);
+    }
+
+    code = insertListBinary(code, binary);
+
+    ListBinary* head = code;
+    while (code != NULL)
+    {
+        (*tree)->binary = insertListBinary((*tree)->binary, code->data);
+        code = code->next;
+    }
+
+    if ((*tree)->left != NULL)
+        makeBinaryHide(&((*tree)->left), head, 0);
+
+    if ((*tree)->right != NULL)
+        makeBinaryHide(&((*tree)->right), head, 1);   
+
+    //freeListBinary(head);
 }
 
 /**
@@ -31,12 +82,25 @@ Tree* init(char character, int occurence){
  * @param Tree*
  * @param value
  */
-Tree* fusionTree(Tree* t1, Tree* t2){
+Tree* mergeTree(Tree* t1, Tree* t2){
 
-    Tree* tree = malloc(sizeof(Tree*));
+    Tree* tree = (Tree*)malloc(sizeof(Tree));
+    if (!tree){
+        perror("Error: Can't allocate memory\n");
+        exit(1);
+    }
+
+    tree->character = '+';
     tree->occurence = 0;
-    tree->left = t1;
-    tree->right = t2;
+
+    if (t1->occurence < t2->occurence)
+    {
+        tree->left = t1;
+        tree->right = t2;
+    } else {
+        tree->left = t2;
+        tree->right = t1;
+    }
 
     if (t1)
         tree->occurence += t1->occurence;
@@ -47,6 +111,12 @@ Tree* fusionTree(Tree* t1, Tree* t2){
     return tree;
 }
 
+/**
+ * @brief Get the node with minimun occurences
+ * 
+ * @param tree 
+ * @return Tree* 
+ */
 Tree* minTree(Tree* tree){
 
     if (!tree)
@@ -58,6 +128,12 @@ Tree* minTree(Tree* tree){
     return minTree(tree->left);
 }
 
+/**
+ * @brief Get the node with maximun occurences
+ * 
+ * @param tree 
+ * @return Tree* 
+ */
 Tree* maxTree(Tree* tree){
 
     if (!tree)
@@ -69,6 +145,12 @@ Tree* maxTree(Tree* tree){
     return maxTree(tree->right);
 }
 
+/**
+ * @brief Get the previous node
+ * 
+ * @param tree 
+ * @return Tree* 
+ */
 Tree* previous(Tree* tree){
 
     if (!tree)
@@ -77,28 +159,18 @@ Tree* previous(Tree* tree){
     return maxTree(tree->left);
 }
 
+/**
+ * @brief Get the next node
+ * 
+ * @param tree 
+ * @return Tree* 
+ */
 Tree* next(Tree* tree){
 
     if (!tree)
         return NULL;
 
     return minTree(tree->right);
-}
-
-/*Free function*/
-
-void freeTree(Tree* tree){
-
-    if (!tree)
-        return;
-
-    if (tree->left)
-        freeTree(tree->left);
-
-    if (tree->right)
-        freeTree(tree->right);
-
-    free(tree);
 }
 
 int depth(Tree* tree){
@@ -117,8 +189,15 @@ int depth(Tree* tree){
         return depthL + 1;
 }
 
-/* Print function */
+/*------------------------------------------------*/
+/*------------------Print function----------------*/
+/*------------------------------------------------*/
 
+/**
+ * @brief Print a tree leaf in prefix mode
+ * 
+ * @param tree 
+ */
 void printPrefixTree(Tree* tree){
 
     if (tree)
@@ -135,6 +214,7 @@ void printPrefixTree(Tree* tree){
     }
 }
 
+/*In DEBUG version*/
 void printInfixTree(Tree* tree){
 
     if (tree)
@@ -142,15 +222,32 @@ void printInfixTree(Tree* tree){
         if (tree->left)
             printInfixTree(tree->left);
 
+          
         if (!tree->left && !tree->right)
-            printf("Character: %c, Occurence: %d\n", tree->character, tree->occurence);
-
+        {
+            printf("Character: %c, Occurence: %d  ", tree->character, tree->occurence);
+            printListBinary(tree->binary);
+            printf("\n");
+        }
+        
         if (tree->right)
             printInfixTree(tree->right);
 
     }
 }
 
+void printRootTree(Tree* tree)
+{
+    if (tree)
+        printf("Character: %c, Occurence: %d\n", tree->character, tree->occurence);
+
+}
+
+/**
+ * @brief Print a tree leaf in postfix mode
+ * 
+ * @param tree 
+ */
 void printPostfixTree(Tree* tree){
 
     if (tree)
@@ -164,4 +261,30 @@ void printPostfixTree(Tree* tree){
         if (!tree->left && !tree->right)
             printf("Character: %c, Occurence: %d\n", tree->character, tree->occurence);
     }
+}
+
+/*------------------------------------------------*/
+/*--------------Free function---------------------*/
+/*------------------------------------------------*/
+
+/**
+ * @brief Free a tree
+ * 
+ * @param tree 
+ */
+void freeTree(Tree* tree){
+
+    if (!tree)
+        return;
+
+    if (tree->left)
+        freeTree(tree->left);
+
+    if (tree->right)
+        freeTree(tree->right);
+
+    if(tree->binary)
+        freeListBinary(tree->binary);
+    
+    free(tree);
 }

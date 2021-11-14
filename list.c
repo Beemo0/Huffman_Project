@@ -6,12 +6,11 @@
 
 List* addToList(List* list, char character)
 {
-
     if (list == NULL)
     {
-        list = malloc(sizeof(List));
+        list = (List*)malloc(sizeof(List));
         if (!list){
-            printf("Error: Allocation");
+            perror("Error: Allocation");
             exit(1);
         }
 
@@ -21,32 +20,36 @@ List* addToList(List* list, char character)
 
     } else {
         
-        List* tmp = list;
+        /*Search for the character in the List*/
+        List* tmp1 = list;
 
-        while (tmp != NULL)
+        while (tmp1 != NULL)
         {
-            if (tmp->tree != NULL)
+            if (tmp1->tree != NULL)
             {
-                if (character == tmp->tree->character)
+                if (character == tmp1->tree->character)
                 {
-                    tmp->tree->occurence++;
+                    tmp1->tree->occurence++;
                     return list;
                 }
             }
-            tmp = tmp->next;
+            tmp1 = tmp1->next;
         }
-        
-        /* If the character isn't already in the list*/
-        tmp = NULL;
-        tmp = malloc(sizeof(List));
-        if (!tmp){
-            printf("Error: Allocation");
+
+        /*If the character isn't already in the list*/
+        /*Create a new node for it*/
+        List* tmp2 = list;
+
+        tmp2 = NULL;
+        tmp2 = (List*)malloc(sizeof(List));
+        if (!tmp2){
+            perror("Error: Allocation");
             exit(1);
         }
 
-        tmp->tree = init(character, 1);
-        tmp->next = list;
-        return tmp;
+        tmp2->tree = init(character, 1);
+        tmp2->next = list;
+        return tmp2;
     }
 }
 
@@ -54,9 +57,9 @@ List* insertList(List* list, Tree* tree)
 {
     if (list == NULL)
     {
-        list = malloc(sizeof(List));
+        list = (List*)malloc(sizeof(List));
         if (!list){
-            printf("Error: Allocation");
+            perror("Error: Allocation");
             exit(1);
         }
 
@@ -67,7 +70,7 @@ List* insertList(List* list, Tree* tree)
     } else {
         
         List* tmp = NULL;
-        tmp = malloc(sizeof(List));
+        tmp = (List*)malloc(sizeof(List));
         if (!tmp){
             printf("Error: Allocation");
             exit(1);
@@ -94,8 +97,8 @@ List* fSort(List* list)
             List* tmp = NULL;
 
             /*Swap the two node in a new List*/
-            insertList(tmp, list->tree);
-            insertList(tmp, list->next->tree);
+            tmp = insertList(tmp, list->tree);
+            tmp = insertList(tmp, list->next->tree);
 
             freeList(list);  //Free the old List
             
@@ -110,7 +113,6 @@ List* fSort(List* list)
 }
 
 
-//Possibilite d'utiliser des threads
 List* fSortHide(List* list)
 {
     /*If the current or next node is null: stop*/
@@ -131,7 +133,7 @@ List* fSortHide(List* list)
 }
 
 /**
- * @brief Merge two list
+ * @brief Merge two List
  * 
  * @param n1 
  * @param n2 
@@ -139,14 +141,15 @@ List* fSortHide(List* list)
  */
 List* mergeList(List* n1, List* n2) {
 
-    if(n1 == NULL) 
+    if(n1 == NULL)      //If n1 is empty return the other list
         return n2;
     
-    if(n2 == NULL)
+    if(n2 == NULL)      //If n2 is empty return the other list
         return n1;
 
     List* head = NULL;
 
+    /*Recursively order the new list "head" with the other two*/
     if(n1->tree->occurence <= n2->tree->occurence)
     {
         head = n1;
@@ -160,7 +163,7 @@ List* mergeList(List* n1, List* n2) {
 }
 
 /**
- * @brief Split a list into n1 and n2
+ * @brief Split a List into two List n1 and n2
  * 
  * @param list 
  * @param n1 
@@ -188,15 +191,51 @@ void splitList(List* list, List** n1, List** n2)
     *n1 = list;        //n1 is the first half of list
 
     *n2 = left->next;  //n2 is the second half of list
-	left->next = NULL; //Left->next is the end of the first half
-} 
+	left->next = NULL;
+}
+
+/*------------------------------------------------*/
+/*------------------------------------------------*/
+/*------------------------------------------------*/
+//DEBUG
+void createHuffmanTree(List** list){
+
+    /*If the list is empty*/
+    if (*list == NULL)
+        return;
+    
+    List* n1 = NULL;
+    List* n2 = NULL;
+
+    /*While the list doesn't content only one element*/
+    while ((*list) != NULL && (*list)->next != NULL)
+    {   
+        /*Sort the List*/
+        (*list) = fSort((*list));
+
+        /*Take the two lowest element (in term of occurences)*/
+        n1 = (*list);
+        n2 = (*list)->next;
+
+        /*Merge their tree into a single one*/
+        Tree* t1 = NULL;
+        t1 = mergeTree(n1->tree, n2->tree);
+
+        /*Pop thee element out of the List*/
+        popList(list);
+        popList(list);
+
+        /*Insert the new tree contening the two old tree*/
+        (*list) = insertList((*list), t1); 
+    }
+}
 
 /*------------------------------------------------*/
 /*----------------Utility function----------------*/
 /*------------------------------------------------*/
 
 /**
- * @brief Get the lenght of a list 
+ * @brief Get the lenght of a List 
  * 
  * @param list 
  * @return int 
@@ -210,7 +249,7 @@ int lenghtList(List* list)
 }
 
 /**
- * @brief Print the list
+ * @brief Print a List
  * 
  * @param list 
  */
@@ -225,7 +264,7 @@ void printList(List* list){
 }
 
 /**
- * @brief Free the list
+ * @brief Free a List
  * 
  * @param list 
  */
@@ -237,4 +276,21 @@ void freeList(List* list){
     freeList(list->next);
 
     free(list);
+}
+
+/**
+ * @brief Free the first element of a List
+ * 
+ * @param list 
+ */
+void popList(List** list){
+
+    if (list == NULL)
+        return;
+    
+    List* tmp = *list;
+    (*list) = (*list)->next;
+
+    free(tmp);
+
 }

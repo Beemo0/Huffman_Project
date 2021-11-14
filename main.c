@@ -21,16 +21,18 @@ int main(int argc, char *argv[]){
             list = addToList(list, (char)c);
         }
 
-        list = fSort(list);
+        createHuffmanTree(&list);
+        
+        makeBinary(&(list->tree));
+        
+        printf("----------------\n");
         printList(list);
-
-
         
         fclose(file);
         freeList(list);
 
     } else {
-        perror("Error: File not open\n");
+        perror("Error: File not find\n");
     }
 
     return 0;
