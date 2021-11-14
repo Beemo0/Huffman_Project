@@ -2,6 +2,7 @@
 #define FUNCTIONS
 
 #include "main.h"
+#define llui long long unsigned int
 
 void printNode(Node* node);
 
@@ -15,7 +16,7 @@ void AddChar(Node* node, char name);
 
 Node* MakeTree(Node* node);
 
-void ReadTree(Node* node, Node* root, int buffer);
+void ReadTree(Node* node, Node* root,llui buffer);
 
 void treeprint(Node* root, int level);
 

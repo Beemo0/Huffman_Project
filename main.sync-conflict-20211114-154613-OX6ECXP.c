@@ -2,7 +2,7 @@
 
 int main(int argc, char const *argv[]) {
 	FILE* file = NULL;
-	file = fopen("h2g2.txt","r");
+	file = fopen("test.txt","r");
 
 
 	char in[50] = "freq : ";
@@ -33,11 +33,10 @@ int main(int argc, char const *argv[]) {
 			buffer = fgetc(file);
 		}
 		fclose(file);
-		node = MergeSort(node);
+		MergeSort(node);
 		printNode(node);
 
 		node = MakeTree(node);
-		printf("main debug 1 \n");
 		printNode(node);
 		printf("le a c'est : %c\n",node->left->box.name);
 		treeprint(node, 0);

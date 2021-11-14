@@ -2,7 +2,8 @@
 
 void printNode(Node* node) {
 	if (!node) return;
-	printf("Character: %c, Occurence: %d\n", node->box.name,  node->box.freq);
+	printf("Character: %c", node->box.name);
+	printf("Occurence: %d\n", node->box.freq);
 	printNode(node->next);
 }
 
@@ -85,7 +86,7 @@ Node* MergeSort(Node* node) {
 void AddChar(Node* node, char name) {
 	if (node != NULL) {
 
-		//printf("char -> %c, freq -> %d\n",node->box.name, node->box.freq);
+		printf("char -> %c, freq -> %d\n",node->box.name, node->box.freq);
 	
 		if (node->box.name == name) node->box.freq ++;
 	
@@ -128,16 +129,13 @@ Node* MakeTree(Node* node) {
 
 }
 
-
-/* internet inspired function */
-llui Concatenate(llui x, llui y) {
+int Concatenate(int x, int y) {
     int pow = 10;
     while(y >= pow)
         pow *= 10;
     return x * pow + y;        
 }
 
-/* internet function */
 void treeprint(Node* root, int space)
 {
     // Base case
@@ -161,20 +159,23 @@ void treeprint(Node* root, int space)
     treeprint(root->left, space);
 }
 
-int tree_height(Node* node) {
-    
-    if (!node) return 0;
+int tree_height(Node* root) {
+    // Get the height of the tree
+    if (!root)
+        return 0;
     else {
-        int left_height = tree_height(node->left);
-        int right_height = tree_height(node->right);
-        
-        if (left_height >= right_height) return left_height + 1;
-        
-        else return right_height + 1;
+        // Find the height of both subtrees
+        // and use the larger one
+        int left_height = tree_height(root->left);
+        int right_height = tree_height(root->right);
+        if (left_height >= right_height)
+            return left_height + 1;
+        else
+            return right_height + 1;
     }
 }
 
-void ReadTree(Node* node, Node* root,llui buffer) {
+void ReadTree(Node* node, Node* root, int buffer) {
 
 	printf("read node number : %d\n", node->box.freq);
 	FILE* out = NULL;
@@ -190,8 +191,8 @@ void ReadTree(Node* node, Node* root,llui buffer) {
 			buffer = Concatenate(buffer,2);
 			out = fopen("out.txt","r+");
 			fseek(out,0,SEEK_END);
-			fprintf(out, "char : %c, code : %llu\n",node->left->box.name, buffer );
-			printf("char : %c, code : %llu\n",node->left->box.name, buffer);
+			fprintf(out, "char : %c, code : %d\n",node->left->box.name, buffer );
+			printf("char : %c, code : %d\n",node->left->box.name, buffer);
 			fclose(out);
 			node->left = NULL;
 			if (root->left != NULL || root->right != NULL) ReadTree(root, root, 0);
@@ -207,8 +208,8 @@ void ReadTree(Node* node, Node* root,llui buffer) {
 			buffer = Concatenate(buffer,1);
 			out = fopen("out.txt","r+");
 			fseek(out,0,SEEK_END);
-			fprintf(out, "char : %c, code : %llu\n",node->right->box.name, buffer );
-			printf("char : %c, code : %llu\n",node->right->box.name, buffer);
+			fprintf(out, "char : %c, code : %d\n",node->right->box.name, buffer );
+			printf("char : %c, code : %d\n",node->right->box.name, buffer);
 			fclose(out);
 			node->right = NULL;
 			if (root->left != NULL || root->right != NULL) ReadTree(root, root, 0);
