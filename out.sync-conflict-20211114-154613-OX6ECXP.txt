@@ -1,7 +1,0 @@
-
-char : d, code : 21
-char : c, code : 221
-char : a, code : 2222
-char : b, code : 2221
-char : f, code : 12
-char : e, code : 11
