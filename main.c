@@ -2,13 +2,19 @@
 #include <stdlib.h>
 #include "tree.h"
 #include "list.h"
+#include "user.h"
 
-int main(int argc, char *argv[]){
+char *path = "text";        //Default path
+short userChoice;           //Get what action the user want
 
+int main(int argc, char *argv[]){ 
+
+    userChoice = userArgument(argc, argv, path);
+    /*
     FILE *file = NULL;
     List* list = NULL;
 
-    file = fopen("text", "r");
+    file = fopen(path, "r+");    //Open the file
 
     if (file)
     {
@@ -36,4 +42,6 @@ int main(int argc, char *argv[]){
     }
 
     return 0;
+
+    */
 }

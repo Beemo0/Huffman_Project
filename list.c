@@ -177,7 +177,7 @@ void splitList(List* list, List** n1, List** n2)
 	left = list; 
     right = list->next; 
 
-	//Get left to the middle point of list
+	/*Get left to the middle point of list*/
 	while (right != NULL)
     { 
 		right = right->next;
@@ -197,7 +197,11 @@ void splitList(List* list, List** n1, List** n2)
 /*------------------------------------------------*/
 /*------------------------------------------------*/
 /*------------------------------------------------*/
-//DEBUG
+/**
+ * @brief Create a Huffman Tree object
+ * 
+ * @param list 
+ */
 void createHuffmanTree(List** list){
 
     /*If the list is empty*/
