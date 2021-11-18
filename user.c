@@ -19,7 +19,7 @@ int userArgument(int argc, char *argv[], char *path)
         if (strcmp(argv[i], "-h") == 0)
         {
             printf("Help: %s\n", argv[i]);
-            return 2;
+            return 3;
         }
         
     }
