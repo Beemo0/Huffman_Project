@@ -2,6 +2,7 @@
 #define STRUCT
 
 #include "main.h"
+#include <inttypes.h>
 #define llui long long unsigned int
 
 typedef struct Box {
@@ -9,9 +10,14 @@ typedef struct Box {
 	int freq;
 } Box;
 
+typedef struct Code {
+	int code;
+	struct Code* next;
+}Code;
+
 typedef struct Table {
 	char name;
-	llui code;
+	Code* listcode;
 	struct Table* next;
 } Table;
 
@@ -28,5 +34,13 @@ typedef struct Node {
 	int isLeaf;
 	Way* way;
 } Node;
+
+typedef struct ByteList {
+	uint8_t Byt;
+	uint8_t count;
+	struct ByteList* next;
+}ByteList;
+
+
 
 #endif

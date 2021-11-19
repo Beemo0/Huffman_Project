@@ -7,6 +7,7 @@
 #include "struct.h"
 #include "functions.h"
 #include <string.h>
+#include <inttypes.h>
 #define llui long long unsigned int
 
 #endif
