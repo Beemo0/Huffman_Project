@@ -22,7 +22,7 @@ void printCodeList(Code* codeList) {
 
 void printByteList(ByteList* bList) {
 	if (!bList) return;
-	printf("%" PRIu8, bList->Byt);
+	printf("%" SCNd8, bList->Byt);
 	printByteList(bList->next);
 }
 
@@ -150,8 +150,8 @@ Node* MakeTree(Node* node) {
 
 uint8_t BitAdd(uint8_t x, uint8_t y) {
     x <<= 1;
-		x |= y;
-		return x;
+	x |= y;
+	return x;
 }
 
 /* internet function */
@@ -172,7 +172,7 @@ void treeprint(Node* root, int space)
     printf("\n");
     for (int i = 10; i < space; i++)
         printf(" ");
-    printf("%d\n", root->box.freq);
+    printf("%c%d\n", root->box.name, root->box.freq);
 
     // Process left child
     treeprint(root->left, space);
@@ -191,51 +191,69 @@ int tree_height(Node* node) {
     }
 }
 
-void ReadTree(Node* node, Node* root, Code* buffer, Table** table) {
+void ReadTree(Node* node, Code* buffer, Table** table) {
+	if (!node->left & !node->right) {
+		buffer = AddIntToBuffer(buffer, buffer, 0);
+		*table = AddCharTable(*table, node->box.name, buffer);
+	} else ReadTreeRec(node, node, buffer, table);
+}
+
+void ReadTreeRec(Node* node, Node* root, Code* buffer, Table** table) {
 
 	if (node->left != NULL) {
 		if (node->left->left == NULL && node->left->right == NULL && node->left->isLeaf == 0) {
 			node->left = NULL;
-			if (root->left != NULL || root->right != NULL) ReadTree(root, root, NULL, table);
+			if (root->left != NULL || root->right != NULL) ReadTreeRec(root, root, NULL, table);
 
 		} else if (node->left->isLeaf == 1) {
-			buffer = AddIntToBuffer(buffer, 0);
+			
+			buffer = AddIntToBuffer(buffer, buffer, 0);
 			*table = AddCharTable(*table,node->left->box.name, buffer);
 			node->left = NULL;
-			if (root->left != NULL || root->right != NULL) ReadTree(root, root, NULL, table);
+			if (root->left != NULL || root->right != NULL) ReadTreeRec(root, root, NULL, table);
+		
+		} else {
+			buffer = AddIntToBuffer(buffer, buffer, 0);
+			ReadTreeRec(node->left,root,buffer, table);
 		}
 	}
 
 	if (node->right != NULL) {
 		if (node->right->left == NULL && node->right->right == NULL && node->right->isLeaf == 0) {
 			node->right = NULL;
-			if (root->left != NULL || root->right != NULL) ReadTree(root, root, NULL, table);
+			if (root->left != NULL || root->right != NULL) ReadTreeRec(root, root, NULL, table);
 
 		} else if (node->right->isLeaf == 1) {
-			buffer = AddIntToBuffer(buffer, 1);
+			buffer = AddIntToBuffer(buffer, buffer, 1);
 			*table = AddCharTable(*table,node->right->box.name, buffer);
 			node->right = NULL;
-			if (root->left != NULL || root->right != NULL) ReadTree(root, root, NULL, table);
-
+			if (root->left != NULL || root->right != NULL) ReadTreeRec(root, root, NULL, table);
+		
+		} else {
+			buffer = AddIntToBuffer(buffer, buffer, 1);
+			ReadTreeRec(node->right,root,buffer, table);
 		}
 	}
-	if (node->left != NULL) {
-		buffer = AddIntToBuffer(buffer, 0);
-		ReadTree(node->left,root,buffer, table);
-	} else if (node->right != NULL) {
-		buffer = AddIntToBuffer(buffer, 1);
-		ReadTree(node->right,root,buffer, table);
-	}
+
 }
 
-Code* AddIntToBuffer(Code* buffer, int value) {
-
-	Code* new = malloc(sizeof(*new));
-
-	new->code = value;
-	new->next = buffer;
-
-	return new;
+Code* AddIntToBuffer(Code* buffer, Code* root, int value) {
+	if (!buffer) {
+		Code* new = malloc(sizeof(*new));
+		new->code = value;
+		new->next = NULL;
+		return new;
+	
+	} else if (buffer->next != NULL) AddIntToBuffer(buffer->next,root, value);
+	
+	else {
+		Code* new = malloc(sizeof(*new));
+		new->code = value;
+		new->next = NULL;
+		buffer->next = new;
+		return root;
+	} 
+	return;
 }
 
 
@@ -287,30 +305,41 @@ void ReplaceText(char* filename, Table* table) {
 	FILE* inFile = fopen(filename, "r");
 	FILE* outFile = fopen("out", "w");
 
+	int countByte_v = 1;
+	int* countByte = &countByte_v;
+
+
 	if (!inFile || !outFile) exit(EXIT_FAILURE);
 
 	fseek(inFile,0,SEEK_SET);
 	fseek(outFile,0,SEEK_SET);
 	char charbuffer = fgetc(inFile);
 
+	Code* codeList = NULL;
+
 	ByteList* bList = malloc(sizeof(*bList));
 	bList->count = 0;
 	bList->Byt = 0;
 	bList->next = NULL;
 
-	Code* codeList = NULL;
-
+	
+//Filling Byte list
 	while (charbuffer != EOF) {
 		codeList = Encode(charbuffer,table);
-		Bytify(bList, codeList);
+		printf("on rentre : ");
+		printCodeList(codeList);
+		printf(" dans l'octet\n");
+		Bytify(bList, codeList, countByte);
 		charbuffer = fgetc(inFile);
 	}
+
+	printf("number of Bytes out : %d\n", *countByte);
 
 
 	printf("ByteList : ");
 	printByteList(bList);
 
-	printByte(bList, outFile);
+	WriteByte(bList, outFile);
 
 
 
@@ -318,42 +347,51 @@ void ReplaceText(char* filename, Table* table) {
 	fclose(outFile);
 }
 
-void printByte(ByteList* bList, FILE* outFile) {
+void WriteByte(ByteList* bList, FILE* outFile) {
 	if (!bList) return;
 	fwrite(&bList->Byt,1,1,outFile);
-	printByte(bList->next, outFile);
+	WriteByte(bList->next, outFile);
 
 }
 
-void Bytify(ByteList* bList, Code* codeList) {
+void Bytify(ByteList* bList, Code* codeList, int* countByte) {
 
 	if (!bList) return;
 	else if (codeList->code != 1 && codeList->code != 0) exit(3);
-	else if (bList->count == 8 && bList->next != NULL) Bytify(bList->next, codeList);
-	else if (!bList->next) {
-			ByteList* new = malloc(sizeof(*new));
-
-			new->count = 1;
-			new->Byt = BitAdd(bList->Byt, 0);
-			printf("Byt = : %" PRIu8 "\n" ,bList->Byt);
-			new->next = NULL;
-
-			bList->next = new;
-	}
+	else if (bList->count == 8 && bList->next != NULL) Bytify(bList->next, codeList, countByte);
 	else if (bList->count < 8) {
 		printf("we add %d to ",codeList->code);
 		printf("%" PRIu8 "\n" ,bList->Byt);
 		bList->Byt = BitAdd(bList->Byt, codeList->code);
 		bList->count ++;
+		if (codeList->next != NULL) Bytify(bList, codeList->next, countByte);
+	
+	} else if (!bList->next) {
+
+		*countByte += 1;
+		ByteList* new = malloc(sizeof(*new));
+
+		new->count = 1;
+		new->Byt = BitAdd(bList->Byt, codeList->code);
+		
+		new->next = NULL;
+
+		printf("we add %d to Byte n° : %d",codeList->code, *countByte);
+		printf("%" PRIu8 "\n" ,bList->Byt);
+
+		bList->next = new;
+
+		if (codeList->next != NULL) Bytify(bList->next, codeList->next, countByte);
 	}
+	
 
 }
 
 Code* Encode(char name, Table* table) {
-
+	if (!table) exit(1);
 	while(name != table->name) {
 		table = table->next;
-		if (!table) exit(EXIT_FAILURE);
+		if (!table) exit(2);
 	}
 
 	return table->listcode;

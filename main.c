@@ -18,7 +18,10 @@ int main(int argc, char const *argv[]) {
 
 		Code* buffer = NULL;
 
-		ReadTree(node,node, buffer, table_p);
+		treeprint(node, 5);
+
+		ReadTree(node, buffer, table_p);
+
 		printTable(table);
 
 		ReplaceText("h2g2.txt", table);
