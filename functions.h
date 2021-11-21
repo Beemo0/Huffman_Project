@@ -7,6 +7,8 @@
 
 void printNode(Node* node);
 
+void fprintNode(Node* node, FILE* outFile);
+
 void printTable(Table* table);
 
 void printCodeList(Code* codeList);
@@ -31,13 +33,13 @@ void treeprint(Node* root, int level);
 
 int tree_height(Node* root);
 
-Code* AddIntToBuffer(Code* buffer, Code* root, int value);
+Code* AddIntToBuffer(Code* buffer, Code* root, uint8_t value);
 
 Table* AddCharTable(Table* table, char name, Code* code);
 
 Node* FillList(Node* node, char* filename);
 
-void ReplaceText(char* filename, Table* table);
+void ReplaceText(char* filename, FILE* outFile, Table* table);
 
 void WriteByte(ByteList* bList, FILE* outFile);
 
@@ -46,6 +48,16 @@ ByteList* InitByteList(Code* codeList);
 void Bytify(ByteList* bList, Code* codeList, int* countByte);
 
 Code* Encode(char name, Table* table);
+
+FILE* MakeBinList(FILE* inFile, int* countByte, FILE* buffFile);
+
+Node* fscanNode(FILE* inFile, int* countByte);
+
+void WriteFile(FILE* outFile, Node* node, Node* root, FILE* buffFile, int issue);
+
+void ReverseNodeRec(Node* node, Node* buffer, Node** root);
+
+void ReverseNode(Node** node);
 
 
 #endif

@@ -6,6 +6,12 @@ void printNode(Node* node) {
 	printNode(node->next);
 }
 
+void fprintNode(Node* node, FILE* outFile) {
+	if (!node) return;
+	fprintf(outFile,"%c%d ", node->box.name,  node->box.freq);
+	fprintNode(node->next, outFile);
+}
+
 void printTable(Table* table) {
 	if (!table) return;
 	printf("Character : %c codé : ", table->name);
@@ -18,6 +24,12 @@ void printCodeList(Code* codeList) {
 	if (!codeList) return;
 	printf("%" PRIu8, codeList->code);
 	printCodeList(codeList->next);
+}
+
+void freeCodeList(Code* codeList) {
+	if (!codeList) return;
+	freeCodeList(codeList->next);
+	free(codeList);
 }
 
 void printByteList(ByteList* bList) {
@@ -101,6 +113,39 @@ Node* MergeSort(Node* node) {
 
 	return node;
 }
+
+Node* FillList(Node* node, char* filename) {
+
+	FILE* file = NULL;
+	file = fopen(filename,"r");
+
+	if (file != NULL) {
+
+		fseek(file,0,SEEK_SET); //set cursor to the beginning
+
+		char buffer;
+		buffer = fgetc(file); //get the first char
+
+		node->box.name = buffer;
+		node->box.freq = 0;
+		node->next = NULL;
+		node->isLeaf = 1;
+		node->left = NULL;
+		node->right = NULL;
+
+
+		while(buffer != EOF){
+			AddChar(node, buffer);
+			buffer = fgetc(file);
+		}
+
+		fclose(file);
+
+		return node;
+
+	} else printf("Error : file not found\n");
+}
+
 
 void AddChar(Node* node, char name) {
 	if (node != NULL) {
@@ -237,7 +282,7 @@ void ReadTreeRec(Node* node, Node* root, Code* buffer, Table** table) {
 
 }
 
-Code* AddIntToBuffer(Code* buffer, Code* root, int value) {
+Code* AddIntToBuffer(Code* buffer, Code* root, uint8_t value) {
 	if (!buffer) {
 		Code* new = malloc(sizeof(*new));
 		new->code = value;
@@ -268,42 +313,9 @@ Table* AddCharTable(Table* table, char name, Code* code) {
 	return new;
 }
 
-Node* FillList(Node* node, char* filename) {
-
-	FILE* file = NULL;
-	file = fopen(filename,"r");
-
-	if (file != NULL) {
-
-		fseek(file,0,SEEK_SET); //set cursor to the beginning
-
-		char buffer;
-		buffer = fgetc(file); //get the first char
-
-		node->box.name = buffer;
-		node->box.freq = 0;
-		node->next = NULL;
-		node->isLeaf = 1;
-		node->left = NULL;
-		node->right = NULL;
-
-
-		while(buffer != EOF){
-			AddChar(node, buffer);
-			buffer = fgetc(file);
-		}
-
-		fclose(file);
-
-		return node;
-
-	} else printf("Error : file not found\n");
-}
-
-void ReplaceText(char* filename, Table* table) {
+void ReplaceText(char* filename, FILE* outFile, Table* table) {
 
 	FILE* inFile = fopen(filename, "r");
-	FILE* outFile = fopen("out", "w");
 
 	int countByte_v = 1;
 	int* countByte = &countByte_v;
@@ -311,8 +323,6 @@ void ReplaceText(char* filename, Table* table) {
 
 	if (!inFile || !outFile) exit(EXIT_FAILURE);
 
-	fseek(inFile,0,SEEK_SET);
-	fseek(outFile,0,SEEK_SET);
 	char charbuffer = fgetc(inFile);
 
 	Code* codeList = NULL;
@@ -326,25 +336,15 @@ void ReplaceText(char* filename, Table* table) {
 //Filling Byte list
 	while (charbuffer != EOF) {
 		codeList = Encode(charbuffer,table);
-		printf("on rentre : ");
-		printCodeList(codeList);
-		printf(" dans l'octet\n");
 		Bytify(bList, codeList, countByte);
 		charbuffer = fgetc(inFile);
 	}
 
-	printf("number of Bytes out : %d\n", *countByte);
-
-
-	printf("ByteList : ");
-	printByteList(bList);
+	fprintf(outFile, "$%d $$ ", *countByte);
 
 	WriteByte(bList, outFile);
 
-
-
 	fclose(inFile);
-	fclose(outFile);
 }
 
 void WriteByte(ByteList* bList, FILE* outFile) {
@@ -360,8 +360,7 @@ void Bytify(ByteList* bList, Code* codeList, int* countByte) {
 	else if (codeList->code != 1 && codeList->code != 0) exit(3);
 	else if (bList->count == 8 && bList->next != NULL) Bytify(bList->next, codeList, countByte);
 	else if (bList->count < 8) {
-		printf("we add %d to ",codeList->code);
-		printf("%" PRIu8 "\n" ,bList->Byt);
+
 		bList->Byt = BitAdd(bList->Byt, codeList->code);
 		bList->count ++;
 		if (codeList->next != NULL) Bytify(bList, codeList->next, countByte);
@@ -376,9 +375,6 @@ void Bytify(ByteList* bList, Code* codeList, int* countByte) {
 		
 		new->next = NULL;
 
-		printf("we add %d to Byte n° : %d",codeList->code, *countByte);
-		printf("%" PRIu8 "\n" ,bList->Byt);
-
 		bList->next = new;
 
 		if (codeList->next != NULL) Bytify(bList->next, codeList->next, countByte);
@@ -388,6 +384,7 @@ void Bytify(ByteList* bList, Code* codeList, int* countByte) {
 }
 
 Code* Encode(char name, Table* table) {
+	
 	if (!table) exit(1);
 	while(name != table->name) {
 		table = table->next;
@@ -397,3 +394,162 @@ Code* Encode(char name, Table* table) {
 	return table->listcode;
 
 }
+
+FILE* MakeBinList(FILE* inFile, int* countByte, FILE* buffFile) {
+
+	char charbuffer = fgetc(inFile);
+	uint8_t bytebuffer[8];
+	uint8_t mask = 254;
+	int count = 0;
+
+	if (!buffFile) exit(11);
+
+
+	while (count < *countByte) {
+
+		for (int i=0; i<8; i++) {
+			if ((mask | (uint8_t)(charbuffer)) == 254) bytebuffer[i] = 0;
+			else if ((mask | ((uint8_t)(charbuffer)) == 255)) bytebuffer[i] = 1;
+			charbuffer >>= 1;
+		}
+
+		for (int i=7; i>=0; i--) fprintf(buffFile,"%d",bytebuffer[i]);
+
+		//if (count % 100 == 0) fprintf(buffFile,"\n");
+		
+		charbuffer = fgetc(inFile);
+		count++;
+	}
+
+	return buffFile;
+}
+
+int concatenate(int x, int y) {
+    int pow = 10;
+    while(y >= pow)
+        pow *= 10;
+    return x * pow + y;        
+}
+
+Node* fscanNode(FILE* inFile, int* countByte) {
+	
+	fseek(inFile,0,SEEK_SET);
+	char charbuffer;
+	int intbuffer = 0;
+	Node* oldNode = NULL;
+
+	while (1) {
+
+		charbuffer = fgetc(inFile);
+
+		Node* new = malloc(sizeof(*new));
+		new->next = oldNode;
+		new->isLeaf = 1;
+		new->box.name = charbuffer;
+
+		charbuffer = fgetc(inFile);
+
+		while(charbuffer != ' ') {
+			intbuffer = concatenate(intbuffer, (int)(charbuffer)-48);
+			charbuffer = fgetc(inFile);
+		}
+		new->box.freq = intbuffer;
+		intbuffer = 0;
+		if (new->box.freq == -12) {
+			*countByte = new->next->box.freq;
+			return new->next->next;
+		}
+		oldNode = new;
+	}
+	
+}
+
+void WriteFile(FILE* outFile, Node* node, Node* root, FILE* buffFile, int issue) {
+
+	printf("debug -1\n");
+	if (!outFile) exit(10);
+
+	if (!node) {
+		printf("Error : end of branch reached");
+		exit(1);
+	}
+
+	printf("debug 0\n");
+	printf("char : %p\n", node);
+	printf("debug 0.01\n");
+	if (node->isLeaf == 1) {
+		issue += 1;
+		printf("print %c, worked : %d\n", node->box.name, issue);
+		printf("debug 0.1\n");
+		fputc((int)(node->box.name),outFile);
+		printf("debug 0.2\n");
+		return WriteFile(outFile, root, root, buffFile, issue);
+		
+	}
+
+	else {
+		printf("debug 1\n");
+		char charbuffer = fgetc(buffFile);
+		printf("debug 2\n");
+
+		if (charbuffer == EOF) return;
+
+		else if ((int)(charbuffer)-48 == 0) {
+			printf("debug 3\n");
+			return WriteFile(outFile, node->left, root, buffFile, issue);
+		
+		} else if ((int)(charbuffer)-48 == 1) {
+			printf("debug 4\n");
+			return WriteFile(outFile, node->right, root, buffFile, issue);
+		}
+	}
+
+	printf("debug 5\n");
+}
+
+void ReverseNodeRec(Node* node, Node* buffer, Node** root) {
+
+	if (!node->next) {
+   		*root = node;
+		node->next = buffer;
+		return;
+	}
+	Node* next = node->next;
+	node->next = buffer;
+	ReverseNodeRec(next, node, root);
+}
+
+void ReverseNode(Node** node){
+   
+   if (!node) return;
+   ReverseNodeRec(*node, NULL, node);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

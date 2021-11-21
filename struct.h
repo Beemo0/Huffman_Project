@@ -11,7 +11,7 @@ typedef struct Box {
 } Box;
 
 typedef struct Code {
-	int code;
+	uint8_t code;
 	struct Code* next;
 }Code;
 
