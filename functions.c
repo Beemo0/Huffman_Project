@@ -469,17 +469,16 @@ void WriteFile(Node* node, FILE* outFile, FILE* buffFile) {
 	int exitvalue_v = 0;
 	int* exitvalue = &exitvalue_v;
 
-	char charbuffer;
+	char charbuffer_v = 0;
+	char* charbuffer = &charbuffer_v;
 
-	while (charbuffer != EOF) {
-		WriteFileRec(outFile, node, node, buffFile, 0, exitvalue);
+	while (*charbuffer != EOF) {
+		WriteFileRec(outFile, node, node, buffFile, exitvalue, charbuffer);
 		*exitvalue = 0;
-		charbuffer = fgetc(buffFile);
-		fseek(buffFile, -1, SEEK_CUR);
 	}
 }
 
-void WriteFileRec(FILE* outFile, Node* node, Node* root, FILE* buffFile, int issue, int* exitvalue) {
+void WriteFileRec(FILE* outFile, Node* node, Node* root, FILE* buffFile, int* exitvalue, char* charbuffer ) {
 
 	if (!outFile) exit(10);
 
@@ -489,25 +488,26 @@ void WriteFileRec(FILE* outFile, Node* node, Node* root, FILE* buffFile, int iss
 	}
 
 	*exitvalue += 1;
+	//printf("exit : %d\n", *exitvalue);
 
+	//printf("leaf : %d, node : %c, freq : %d\n", node->isLeaf, node->box.name, node->box.freq);
 	if (node->isLeaf == 1) {
-		issue += 1;
 		fputc((int)(node->box.name),outFile);
 		if(*exitvalue >= 1000) return;
-		return WriteFileRec(outFile, root, root, buffFile, issue, exitvalue);
+		return WriteFileRec(outFile, root, root, buffFile, exitvalue, charbuffer);
 		
 	}
 
 	else {
-		char charbuffer = fgetc(buffFile);
+		*charbuffer = fgetc(buffFile);
 
-		if (charbuffer == EOF || *exitvalue >= 1000) return;
+		if (charbuffer == EOF) return;
 
-		else if ((int)(charbuffer)-48 == 0) {
-			return WriteFileRec(outFile, node->left, root, buffFile, issue, exitvalue);
+		else if ((int)(*charbuffer)-48 == 0) {
+			return WriteFileRec(outFile, node->left, root, buffFile, exitvalue, charbuffer);
 		
-		} else if ((int)(charbuffer)-48 == 1) {
-			return WriteFileRec(outFile, node->right, root, buffFile, issue, exitvalue);
+		} else if ((int)(*charbuffer)-48 == 1) {
+			return WriteFileRec(outFile, node->right, root, buffFile, exitvalue, charbuffer);
 		}
 	}
 }

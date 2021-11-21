@@ -8,6 +8,7 @@
 #include "functions.h"
 #include <string.h>
 #include <inttypes.h>
+#include <argp.h>
 #define llui long long unsigned int
 
 #endif
