@@ -61,12 +61,12 @@ int main(int argc, char const *argv[]) {
 
 		node = MakeTree(node);
 
-		treeprint(node, 5);
+		//treeprint(node, 5);
 
 		buffFile = fopen("buffer", "r");
 		fseek(buffFile,0,SEEK_SET);
 
-		WriteFile(outFile, node, node, buffFile, 0);
+		WriteFile(node, outFile, buffFile);
 
 		fclose(buffFile);
 		fclose(inFile);

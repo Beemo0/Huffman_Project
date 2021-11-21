@@ -53,7 +53,9 @@ FILE* MakeBinList(FILE* inFile, int* countByte, FILE* buffFile);
 
 Node* fscanNode(FILE* inFile, int* countByte);
 
-void WriteFile(FILE* outFile, Node* node, Node* root, FILE* buffFile, int issue);
+void WriteFile(Node* node, FILE* outFile, FILE* inFile);
+
+void WriteFileRec(FILE* outFile, Node* node, Node* root, FILE* buffFile, int issue, int* exitvalue);
 
 void ReverseNodeRec(Node* node, Node* buffer, Node** root);
 

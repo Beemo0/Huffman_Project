@@ -464,9 +464,23 @@ Node* fscanNode(FILE* inFile, int* countByte) {
 	
 }
 
-void WriteFile(FILE* outFile, Node* node, Node* root, FILE* buffFile, int issue) {
+void WriteFile(Node* node, FILE* outFile, FILE* buffFile) {
+	
+	int exitvalue_v = 0;
+	int* exitvalue = &exitvalue_v;
 
-	printf("debug -1\n");
+	char charbuffer;
+
+	while (charbuffer != EOF) {
+		WriteFileRec(outFile, node, node, buffFile, 0, exitvalue);
+		*exitvalue = 0;
+		charbuffer = fgetc(buffFile);
+		fseek(buffFile, -1, SEEK_CUR);
+	}
+}
+
+void WriteFileRec(FILE* outFile, Node* node, Node* root, FILE* buffFile, int issue, int* exitvalue) {
+
 	if (!outFile) exit(10);
 
 	if (!node) {
@@ -474,37 +488,28 @@ void WriteFile(FILE* outFile, Node* node, Node* root, FILE* buffFile, int issue)
 		exit(1);
 	}
 
-	printf("debug 0\n");
-	printf("char : %p\n", node);
-	printf("debug 0.01\n");
+	*exitvalue += 1;
+
 	if (node->isLeaf == 1) {
 		issue += 1;
-		printf("print %c, worked : %d\n", node->box.name, issue);
-		printf("debug 0.1\n");
 		fputc((int)(node->box.name),outFile);
-		printf("debug 0.2\n");
-		return WriteFile(outFile, root, root, buffFile, issue);
+		if(*exitvalue >= 1000) return;
+		return WriteFileRec(outFile, root, root, buffFile, issue, exitvalue);
 		
 	}
 
 	else {
-		printf("debug 1\n");
 		char charbuffer = fgetc(buffFile);
-		printf("debug 2\n");
 
-		if (charbuffer == EOF) return;
+		if (charbuffer == EOF || *exitvalue >= 1000) return;
 
 		else if ((int)(charbuffer)-48 == 0) {
-			printf("debug 3\n");
-			return WriteFile(outFile, node->left, root, buffFile, issue);
+			return WriteFileRec(outFile, node->left, root, buffFile, issue, exitvalue);
 		
 		} else if ((int)(charbuffer)-48 == 1) {
-			printf("debug 4\n");
-			return WriteFile(outFile, node->right, root, buffFile, issue);
+			return WriteFileRec(outFile, node->right, root, buffFile, issue, exitvalue);
 		}
 	}
-
-	printf("debug 5\n");
 }
 
 void ReverseNodeRec(Node* node, Node* buffer, Node** root) {
