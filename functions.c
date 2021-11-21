@@ -313,13 +313,14 @@ Table* AddCharTable(Table* table, char name, Code* code) {
 	return new;
 }
 
-void ReplaceText(char* filename, FILE* outFile, Table* table) {
+void ReplaceText(FILE* inFile, FILE* outFile, Table* table, int totalChar) {
 
-	FILE* inFile = fopen(filename, "r");
 
 	int countByte_v = 1;
 	int* countByte = &countByte_v;
 
+	int countLoop = 0;
+	int percent = 0;
 
 	if (!inFile || !outFile) exit(EXIT_FAILURE);
 
@@ -328,16 +329,23 @@ void ReplaceText(char* filename, FILE* outFile, Table* table) {
 	Code* codeList = NULL;
 
 	ByteList* bList = malloc(sizeof(*bList));
+
 	bList->count = 0;
 	bList->Byt = 0;
 	bList->next = NULL;
-
-	
 //Filling Byte list
 	while (charbuffer != EOF) {
 		codeList = Encode(charbuffer,table);
 		Bytify(bList, codeList, countByte);
 		charbuffer = fgetc(inFile);
+		if (countLoop % (totalChar / 100) == 0) {
+			fputs("\033[A\033[2K",stdout);
+			printf("Compressing [ %d% ]\n", percent);
+			percent += 1;
+		}
+		countLoop += 1;
+
+		
 	}
 
 	fprintf(outFile, "$%d $$ ", *countByte);

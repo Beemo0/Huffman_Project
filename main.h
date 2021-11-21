@@ -9,6 +9,7 @@
 #include <string.h>
 #include <inttypes.h>
 #include <argp.h>
+#include <time.h>
 #define llui long long unsigned int
 
 #endif

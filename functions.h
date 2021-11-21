@@ -39,7 +39,7 @@ Table* AddCharTable(Table* table, char name, Code* code);
 
 Node* FillList(Node* node, char* filename);
 
-void ReplaceText(char* filename, FILE* outFile, Table* table);
+void ReplaceText(FILE* inFile, FILE* outFile, Table* table, int totalChar);
 
 void WriteByte(ByteList* bList, FILE* outFile);
 
