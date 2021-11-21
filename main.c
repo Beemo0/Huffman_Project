@@ -9,9 +9,9 @@ int main(int argc, char *argv[]) {
 	char filedest_v[128];
 	char* filedest = &filedest_v;
 
-	if(argc==3) {
+	if(argc>=2) {
  		
- 		if (argv[1][1] == 'c') {
+ 		if (argv[1][1] == 'c' && argv[2] != NULL) {
  			
  			filesubj = argv[2];
  			int lenght = strlen(filesubj);
@@ -23,10 +23,16 @@ int main(int argc, char *argv[]) {
  			mod = 1;
  		}
 
- 		else if (argv[1][1] == 'd') {
+ 		else if (argv[1][1] == 'd' && argv[2] != NULL) {
  			
  			filesubj = argv[2];
  			int lenght = strlen(filesubj);
+
+ 			if (filesubj[lenght-1] != 'f' || filesubj[lenght-2] != 'c' || filesubj[lenght-3] != 'h') {
+ 				printf("Error : Bad filename, please enter a '.hcf' file\n");
+ 				exit(1);
+ 			}
+
  			for (int i=0; i<lenght-4; i++) {
  				filedest[i] = filesubj[i];
  			}
@@ -88,12 +94,23 @@ int main(int argc, char *argv[]) {
 
 		ReplaceText(inFile, outFile, table, totalChar);
 
+		fclose(inFile);
 		fclose(outFile);
+
+		struct stat oldStat;
+		struct stat newStat;
+
+		stat(filesubj, &oldStat);
+		stat(filedest, &newStat);
 
 		end_t = clock();
 
 		fputs("\033[A\033[2K",stdout);
 		printf("Compression done :%g s\n",(double)(end_t - start_t)/CLOCKS_PER_SEC);
+		printf("%f kb compressed to %f kb, (%f%)\n", 
+			(float)(oldStat.st_size)/1000,
+			(float)(newStat.st_size)/1000,
+			(float)(newStat.st_size)/(float)(oldStat.st_size)*100);
 
 
 	} else if (mod == 2) {
@@ -138,6 +155,8 @@ int main(int argc, char *argv[]) {
 		fclose(buffFile);
 		fclose(inFile);
 		fclose(outFile);
+
+		remove("buffer");
 
 		end_t = clock();
 		fputs("\033[A\033[2K",stdout);

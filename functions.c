@@ -352,7 +352,6 @@ void ReplaceText(FILE* inFile, FILE* outFile, Table* table, int totalChar) {
 
 	WriteByte(bList, outFile);
 
-	fclose(inFile);
 }
 
 void WriteByte(ByteList* bList, FILE* outFile) {
