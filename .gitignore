@@ -1,0 +1,6 @@
+test
+*.o
+exe
+out.txt
+test.txt
+buffer
