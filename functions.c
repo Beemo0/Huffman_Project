@@ -1,15 +1,11 @@
 #include "functions.h"
 
+/* ---------- Printing functions ---------- */
+
 void printNode(Node* node) {
 	if (!node) return;
 	printf("Character: %c, Occurence: %d\n", node->box.name,  node->box.freq);
 	printNode(node->next);
-}
-
-void fprintNode(Node* node, FILE* outFile) {
-	if (!node) return;
-	fprintf(outFile,"%c%d ", node->box.name,  node->box.freq);
-	fprintNode(node->next, outFile);
 }
 
 void printTable(Table* table) {
@@ -37,6 +33,32 @@ void printByteList(ByteList* bList) {
 	printf("%" SCNd8, bList->Byt);
 	printByteList(bList->next);
 }
+
+/* internet function */
+void printTree(Node* root, int space)
+{
+    // Base case
+    if (root == NULL)
+        return;
+
+    // Increase distance between levels
+    space += 10;
+
+    // Process right child first
+    printTree(root->right, space);
+
+    // Print current node after space
+    // count
+    printf("\n");
+    for (int i = 10; i < space; i++)
+        printf(" ");
+    printf("%c%d\n", root->box.name, root->box.freq);
+
+    // Process left child
+    printTree(root->left, space);
+}
+
+/* ---------- Merge Sort functions ---------- */
 
 int LenghtList(Node* node) {
 	if (!node) return 0;
@@ -114,6 +136,14 @@ Node* MergeSort(Node* node) {
 	return node;
 }
 
+/* ---------- Compressing ---------- */
+
+void delay(int milli_seconds) {
+	int milli = milli_seconds *1000;
+    clock_t start_time = clock();
+    while (clock() < start_time + milli);
+}
+
 Node* FillList(Node* node, char* filename) {
 
 	FILE* file = NULL;
@@ -146,7 +176,6 @@ Node* FillList(Node* node, char* filename) {
 	} else printf("Error : file not found\n");
 }
 
-
 void AddChar(Node* node, char name) {
 	if (node != NULL) {
 
@@ -171,6 +200,12 @@ void AddChar(Node* node, char name) {
 	}
 }
 
+void fprintNode(Node* node, FILE* outFile) {
+	if (!node) return;
+	fprintf(outFile,"%c%d ", node->box.name,  node->box.freq);
+	fprintNode(node->next, outFile);
+}
+
 Node* MakeTree(Node* node) {
 
 	if  (LenghtList(node) == 1) return node;
@@ -191,49 +226,6 @@ Node* MakeTree(Node* node) {
 
 	MakeTree(new);
 
-}
-
-uint8_t BitAdd(uint8_t x, uint8_t y) {
-    x <<= 1;
-	x |= y;
-	return x;
-}
-
-/* internet function */
-void treeprint(Node* root, int space)
-{
-    // Base case
-    if (root == NULL)
-        return;
-
-    // Increase distance between levels
-    space += 10;
-
-    // Process right child first
-    treeprint(root->right, space);
-
-    // Print current node after space
-    // count
-    printf("\n");
-    for (int i = 10; i < space; i++)
-        printf(" ");
-    printf("%c%d\n", root->box.name, root->box.freq);
-
-    // Process left child
-    treeprint(root->left, space);
-}
-
-int tree_height(Node* node) {
-
-    if (!node) return 0;
-    else {
-        int left_height = tree_height(node->left);
-        int right_height = tree_height(node->right);
-
-        if (left_height >= right_height) return left_height + 1;
-
-        else return right_height + 1;
-    }
 }
 
 void ReadTree(Node* node, Code* buffer, Table** table) {
@@ -354,13 +346,6 @@ void ReplaceText(FILE* inFile, FILE* outFile, Table* table, int totalChar) {
 
 }
 
-void WriteByte(ByteList* bList, FILE* outFile) {
-	if (!bList) return;
-	fwrite(&bList->Byt,1,1,outFile);
-	WriteByte(bList->next, outFile);
-
-}
-
 void Bytify(ByteList* bList, Code* codeList, int* countByte) {
 
 	if (!bList) return;
@@ -390,6 +375,12 @@ void Bytify(ByteList* bList, Code* codeList, int* countByte) {
 
 }
 
+uint8_t BitAdd(uint8_t x, uint8_t y) {
+    x <<= 1;
+	x |= y;
+	return x;
+}
+
 Code* Encode(char name, Table* table) {
 	
 	if (!table) exit(1);
@@ -402,41 +393,14 @@ Code* Encode(char name, Table* table) {
 
 }
 
-FILE* MakeBinList(FILE* inFile, int* countByte, FILE* buffFile) {
+void WriteByte(ByteList* bList, FILE* outFile) {
+	if (!bList) return;
+	fwrite(&bList->Byt,1,1,outFile);
+	WriteByte(bList->next, outFile);
 
-	char charbuffer = fgetc(inFile);
-	uint8_t bytebuffer[8];
-	uint8_t mask = 254;
-	int count = 0;
-
-	if (!buffFile) exit(11);
-
-
-	while (count < *countByte) {
-
-		for (int i=0; i<8; i++) {
-			if ((mask | (uint8_t)(charbuffer)) == 254) bytebuffer[i] = 0;
-			else if ((mask | ((uint8_t)(charbuffer)) == 255)) bytebuffer[i] = 1;
-			charbuffer >>= 1;
-		}
-
-		for (int i=7; i>=0; i--) fprintf(buffFile,"%d",bytebuffer[i]);
-
-		//if (count % 100 == 0) fprintf(buffFile,"\n");
-		
-		charbuffer = fgetc(inFile);
-		count++;
-	}
-
-	return buffFile;
 }
 
-int concatenate(int x, int y) {
-    int pow = 10;
-    while(y >= pow)
-        pow *= 10;
-    return x * pow + y;        
-}
+/* ---------- Decompressing ---------- */
 
 Node* fscanNode(FILE* inFile, int* countByte) {
 	
@@ -469,6 +433,60 @@ Node* fscanNode(FILE* inFile, int* countByte) {
 		oldNode = new;
 	}
 	
+}
+
+int concatenate(int x, int y) {
+    int pow = 10;
+    while(y >= pow)
+        pow *= 10;
+    return x * pow + y;        
+}
+
+void ReverseNode(Node** node){
+   
+   if (!node) return;
+   ReverseNodeRec(*node, NULL, node);
+}
+
+void ReverseNodeRec(Node* node, Node* buffer, Node** root) {
+
+	if (!node->next) {
+   		*root = node;
+		node->next = buffer;
+		return;
+	}
+	Node* next = node->next;
+	node->next = buffer;
+	ReverseNodeRec(next, node, root);
+}
+
+FILE* MakeBinList(FILE* inFile, int* countByte, FILE* buffFile) {
+
+	char charbuffer = fgetc(inFile);
+	uint8_t bytebuffer[8];
+	uint8_t mask = 254;
+	int count = 0;
+
+	if (!buffFile) exit(11);
+
+
+	while (count < *countByte) {
+
+		for (int i=0; i<8; i++) {
+			if ((mask | (uint8_t)(charbuffer)) == 254) bytebuffer[i] = 0;
+			else if ((mask | ((uint8_t)(charbuffer)) == 255)) bytebuffer[i] = 1;
+			charbuffer >>= 1;
+		}
+
+		for (int i=7; i>=0; i--) fprintf(buffFile,"%d",bytebuffer[i]);
+
+		//if (count % 100 == 0) fprintf(buffFile,"\n");
+		
+		charbuffer = fgetc(inFile);
+		count++;
+	}
+
+	return buffFile;
 }
 
 void WriteFile(Node* node, FILE* outFile, FILE* buffFile) {
@@ -517,24 +535,6 @@ void WriteFileRec(FILE* outFile, Node* node, Node* root, FILE* buffFile, int* ex
 			return WriteFileRec(outFile, node->right, root, buffFile, exitvalue, charbuffer);
 		}
 	}
-}
-
-void ReverseNodeRec(Node* node, Node* buffer, Node** root) {
-
-	if (!node->next) {
-   		*root = node;
-		node->next = buffer;
-		return;
-	}
-	Node* next = node->next;
-	node->next = buffer;
-	ReverseNodeRec(next, node, root);
-}
-
-void ReverseNode(Node** node){
-   
-   if (!node) return;
-   ReverseNodeRec(*node, NULL, node);
 }
 
 

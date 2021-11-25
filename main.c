@@ -52,6 +52,7 @@ int main(int argc, char *argv[]) {
 
 	} else printf("Bad arguments use -h for help\n");
 
+/* ---------- Compressing --------- */
 	if (mod == 1) {
 
 		clock_t start_t, end_t, total_t;
@@ -145,7 +146,7 @@ int main(int argc, char *argv[]) {
 
 		node = MakeTree(node);
 
-		//treeprint(node, 5);
+		//printTree(node, 5);
 
 		buffFile = fopen("buffer", "r");
 		fseek(buffFile,0,SEEK_SET);
