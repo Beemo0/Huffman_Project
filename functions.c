@@ -69,8 +69,8 @@ Node* Merge(Node* a,Node* b) {
 
 	Node* result = NULL;
 
-	if (a == NULL) return (b);
-	else if (b == NULL) return (a);
+	if (!a) return (b);
+	else if (!b) return (a);
 
 	if (a->box.freq <= b->box.freq) {
 		result = a;
@@ -89,9 +89,9 @@ void Split(Node* node, Node** A, Node** B) {
 	Node* fast = node->next;
 	Node* slow = node;
 
-	while (fast != NULL) {
+	while (fast) {
 		fast = fast->next;
-		if (fast != NULL) {
+		if (fast) {
 			slow = slow->next;
 			fast = fast->next;
 		}
@@ -149,7 +149,7 @@ Node* FillList(Node* node, char* filename) {
 	FILE* file = NULL;
 	file = fopen(filename,"r");
 
-	if (file != NULL) {
+	if (file) {
 
 		fseek(file,0,SEEK_SET); //set cursor to the beginning
 
@@ -177,15 +177,15 @@ Node* FillList(Node* node, char* filename) {
 }
 
 void AddChar(Node* node, char name) {
-	if (node != NULL) {
+	if (node) {
 
 		//printf("char -> %c, freq -> %d\n",node->box.name, node->box.freq);
 
 		if (node->box.name == name) node->box.freq ++;
 
 		else {
-			if (node->next == NULL) {
-				Node* new = malloc(sizeof(*new));
+			if (node->next) {
+				Node* new = malloc(sizeof *new);
 
 				if (!node || !new) exit(EXIT_FAILURE);
 
