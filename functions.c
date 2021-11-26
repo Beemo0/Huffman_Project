@@ -526,7 +526,7 @@ void WriteFileRec(FILE* outFile, Node* node, Node* root, FILE* buffFile, int* ex
 	else {
 		*charbuffer = fgetc(buffFile);
 
-		if (charbuffer == EOF) return;
+		if ((int)(*charbuffer) == EOF) return;
 
 		else if ((int)(*charbuffer)-48 == 0) {
 			return WriteFileRec(outFile, node->left, root, buffFile, exitvalue, charbuffer);
