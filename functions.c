@@ -44,7 +44,7 @@ void printCodeList(Code* codeList)
 }
 
 /**
- * @brief Free an entire code
+ * @brief Free an entire Code List
  * 
  * @param codeList 
  */
@@ -54,6 +54,65 @@ void freeCodeList(Code* codeList)
 
 	freeCodeList(codeList->next);
 	free(codeList);
+}
+
+/**
+ * @brief Free an entire Way List
+ * 
+ * @param wayList 
+ */
+void freeWayList(Way* wayList)
+{
+	if (!wayList) return;
+
+	freeWayList(wayList->next);
+	free(wayList);
+}
+
+/**
+ * @brief Free an entire Byte List
+ * 
+ * @param bList 
+ */
+void freeByteList(ByteList* bList)
+{
+	if (!bList) return;
+
+	freeByteList(bList);
+	free(bList);
+}
+
+/**
+ * @brief Free an entire Table List
+ * 
+ * @param tabList 
+ */
+void freeTableList(Table* tabList)
+{
+	if (!tabList) return;
+
+	freeTableList(tabList->next);
+	
+	freeCodeList(tabList->listcode);
+	free(tabList);
+}
+
+/**
+ * @brief Free an entire Node List
+ * 
+ * @param node 
+ */
+void freeNodeList(Node* node)
+{
+	if (!node) return;
+
+	freeNodeList(node->next);
+	freeNodeList(node->left);
+	freeNodeList(node->right);
+
+	freeWayList(node->way);
+
+	free(node);
 }
 
 /**
