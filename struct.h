@@ -5,6 +5,7 @@
 #include <inttypes.h>
 #define llui long long unsigned int
 
+
 typedef struct Box {
 	char name;
 	int freq;
@@ -40,7 +41,6 @@ typedef struct ByteList {
 	uint8_t count;
 	struct ByteList* next;
 }ByteList;
-
 
 
 #endif

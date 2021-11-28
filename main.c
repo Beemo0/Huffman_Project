@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
  			
  		}
  		else if (argv[1][1] == 'h') {
-			printf("usage : \n\n-c <your file> to compress \n-d <your file.hcf> to decompress \n-h to print this help\n");
+			printf("Usage : \n\n-c <your file> to compress \n-d <your file.hcf> to decompress \n-h to print this help\n");
 			return 0;
 		
 		} else printf("Bad arguments use -h for help\n");
@@ -165,8 +165,6 @@ int main(int argc, char *argv[]) {
 
 		//printCodeList(binList);
 	}
-
-
 
 	return 0;
 }
