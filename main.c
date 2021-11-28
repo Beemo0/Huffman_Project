@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
 	char* filesubj;
 
 	char filedest_v[128];
-	char* filedest = &filedest_v;
+	char* filedest = filedest_v;
 
 	if(argc>=2) {
  		
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 /* ---------- Compressing --------- */
 	if (mod == 1) {
 
-		clock_t start_t, end_t, total_t;
+		clock_t start_t, end_t;
 		start_t = clock();
 
 		Node node_v;
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
 
 	} else if (mod == 2) {
 
-		clock_t start_t, end_t, total_t;
+		clock_t start_t, end_t;
 		start_t = clock();
 
 		Node* node = NULL;

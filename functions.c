@@ -233,7 +233,7 @@ void Split(Node* node, Node** A, Node** B)
  */
 Node* MergeSort(Node* node)
 {
-	if (!node) return;
+	if (!node) return NULL;
 
 	int lenght = LenghtList(node);
 	Node* a = NULL;
@@ -313,7 +313,10 @@ Node* FillList(Node* node, char* filename)
 
 		return node;
 
-	} else printf("Error : file not found\n");
+	} else {
+		printf("Error : file not found\n");
+		return NULL;
+	}
 }
 
 /**
@@ -381,10 +384,11 @@ Node* MakeTree(Node* node)
 	new->isLeaf = 0;
 	new->left = node;
 	new->right = node->next;
+
 	node->next->next = NULL;
 	node->next = NULL;
 
-	MakeTree(new);
+	return MakeTree(new);
 }
 
 /**
@@ -471,16 +475,19 @@ Code* AddIntToBuffer(Code* buffer, Code* root, uint8_t value)
 		new->next = NULL;
 		return new;
 	
-	} else if (buffer->next) AddIntToBuffer(buffer->next,root, value);
-	
-	else {
+	}
+	if (buffer->next)
+	{
+		AddIntToBuffer(buffer->next,root, value);
+		return buffer;
+
+	} else {
 		Code* new = malloc(sizeof(*new));
 		new->code = value;
 		new->next = NULL;
 		buffer->next = new;
 		return root;
-	} 
-	return;
+	}
 }
 
 /**
@@ -629,7 +636,7 @@ void WriteByte(ByteList* bList, FILE* outFile)
 {
 	if (!bList) return;
 
-	fwrite(&bList->Byt,1,1,outFile);
+	fwrite(&bList->Byt, 1, 1, outFile);
 	WriteByte(bList->next, outFile);
 }
 
@@ -751,7 +758,7 @@ FILE* MakeBinList(FILE* inFile, int* countByte, FILE* buffFile)
 		for (int i=0; i<8; i++) 
 		{
 			if ((mask | (uint8_t)(charbuffer)) == 254) bytebuffer[i] = 0;
-			else if ((mask | ((uint8_t)(charbuffer)) == 255)) bytebuffer[i] = 1;
+			else if ((mask | (uint8_t)(charbuffer)) == 255) bytebuffer[i] = 1;
 			charbuffer >>= 1;
 		}
 
