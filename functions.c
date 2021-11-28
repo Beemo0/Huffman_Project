@@ -184,7 +184,7 @@ void AddChar(Node* node, char name) {
 		if (node->box.name == name) node->box.freq ++;
 
 		else {
-			if (node->next) {
+			if (!node->next) {
 				Node* new = malloc(sizeof *new);
 
 				if (!node || !new) exit(EXIT_FAILURE);
