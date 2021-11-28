@@ -77,5 +77,16 @@ void WriteFile(Node* node, FILE* outFile, FILE* inFile);
 
 void WriteFileRec(FILE* outFile, Node* node, Node* root, FILE* buffFile, int* exitvalue, char* charbuffer );
 
+/*Free function*/
+
+void freeWayList(Way* wayList);
+
+void freeByteList(ByteList* bList);
+
+void freeTableList(Table* tabList);
+
+void freeNodeList(Node* node);
+
+void freeCodeList(Code* codeList);
 
 #endif

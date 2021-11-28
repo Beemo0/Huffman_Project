@@ -113,6 +113,8 @@ int main(int argc, char *argv[]) {
 			(float)(newStat.st_size)/1000,
 			(float)(newStat.st_size)/(float)(oldStat.st_size)*100);
 
+		freeNodeList(node);
+		freeCodeList(buffer);
 
 	} else if (mod == 2) {
 

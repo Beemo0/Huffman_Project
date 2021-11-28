@@ -368,7 +368,6 @@ void fprintNode(Node* node, FILE* outFile)
  */
 Node* MakeTree(Node* node) 
 {
-
 	if  (LenghtList(node) == 1) return node;
 
 	node = MergeSort(node);
@@ -386,7 +385,6 @@ Node* MakeTree(Node* node)
 	node->next = NULL;
 
 	MakeTree(new);
-
 }
 
 /**
@@ -415,13 +413,13 @@ void ReadTree(Node* node, Code* buffer, Table** table)
  */
 void ReadTreeRec(Node* node, Node* root, Code* buffer, Table** table) 
 {
-	if (node->left != NULL) 
+	if (node->left) 
 	{
-		if (node->left->left == NULL && node->left->right == NULL && node->left->isLeaf == 0) {
+		if (!node->left->left && !node->left->right && node->left->isLeaf == 0) {
 			node->left = NULL;
 			if (root->left != NULL || root->right != NULL) ReadTreeRec(root, root, NULL, table);
 
-		} else if (node->left->isLeaf == 1) 
+		} else if (node->left->isLeaf) 
 		{
 			buffer = AddIntToBuffer(buffer, buffer, 0);
 			*table = AddCharTable(*table,node->left->box.name, buffer);
@@ -434,19 +432,19 @@ void ReadTreeRec(Node* node, Node* root, Code* buffer, Table** table)
 		}
 	}
 
-	if (node->right != NULL) 
+	if (node->right) 
 	{
-		if (node->right->left == NULL && node->right->right == NULL && node->right->isLeaf == 0) 
+		if (!node->right->left && !node->right->right && node->right->isLeaf == 0) 
 		{
 			node->right = NULL;
-			if (root->left != NULL || root->right != NULL) ReadTreeRec(root, root, NULL, table);
+			if (root->left || root->right) ReadTreeRec(root, root, NULL, table);
 
-		} else if (node->right->isLeaf == 1) 
+		} else if (node->right->isLeaf) 
 		{
 			buffer = AddIntToBuffer(buffer, buffer, 1);
 			*table = AddCharTable(*table,node->right->box.name, buffer);
 			node->right = NULL;
-			if (root->left != NULL || root->right != NULL) ReadTreeRec(root, root, NULL, table);
+			if (root->left || root->right) ReadTreeRec(root, root, NULL, table);
 		
 		} else {
 			buffer = AddIntToBuffer(buffer, buffer, 1);
@@ -473,7 +471,7 @@ Code* AddIntToBuffer(Code* buffer, Code* root, uint8_t value)
 		new->next = NULL;
 		return new;
 	
-	} else if (buffer->next != NULL) AddIntToBuffer(buffer->next,root, value);
+	} else if (buffer->next) AddIntToBuffer(buffer->next,root, value);
 	
 	else {
 		Code* new = malloc(sizeof(*new));
