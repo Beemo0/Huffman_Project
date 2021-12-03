@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "listBinary.h"
 
 typedef struct Tree
@@ -21,6 +22,7 @@ Tree* mergeTree(Tree* t1, Tree* t2);
 
 void makeBinary(Tree** tree);
 void makeBinaryHide(Tree** tree, ListBinary* code, short binary);
+ListBinary* getBinaryCode(char* character, Tree* tree);
 
 Tree* maxTree(Tree* tree);
 Tree* minTree(Tree* tree);

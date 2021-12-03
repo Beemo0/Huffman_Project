@@ -4,6 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-int userArgument(int argc, char *argv[], char *path);
+int userArgument(int argc, char *argv[], char **path);
 
 #endif

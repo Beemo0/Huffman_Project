@@ -1,7 +1,7 @@
 #include "listBinary.h"
 
 /**
- * @brief 
+ * @brief Insert an element in a binary list
  * 
  * @param bin 
  * @param value 
@@ -9,7 +9,7 @@
  */
 ListBinary* insertListBinary(ListBinary* bin, short value)
 {
-    if (bin == NULL)
+    if (!bin)
     {
         bin = (ListBinary*)malloc(sizeof(ListBinary));
         if (!bin){
@@ -70,7 +70,7 @@ void printListBinary(ListBinary* bin){
  */
 void freeListBinary(ListBinary* bin){
 
-    if (bin == NULL)
+    if (!bin)
         return;
 
     freeListBinary(bin->next);

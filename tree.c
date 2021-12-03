@@ -2,10 +2,10 @@
 
 /**
  * @brief Initialise a node with a character and it's occurences
- * 
- * @param character 
- * @param occurence 
- * @return Tree* 
+ *
+ * @param character
+ * @param occurence
+ * @return Tree*
  */
 Tree* init(char character, unsigned int occurence){
 
@@ -35,23 +35,28 @@ Tree* init(char character, unsigned int occurence){
     return tmp;
 }
 
+/**
+ * @brief Make the binary code for each character in an huffman tree
+ *
+ * @param tree
+ */
 void makeBinary(Tree** tree)
 {
     if (*tree == NULL)
         return;
-    
-    if ((*tree)->left != NULL)
+
+    if ((*tree)->left)
         makeBinaryHide(&((*tree)->left), NULL, 0);
 
-    if ((*tree)->right != NULL)
+    if ((*tree)->right)
         makeBinaryHide(&((*tree)->right), NULL, 1);
 }
 
 void makeBinaryHide(Tree** tree, ListBinary* code, short binary)
 {
-    if (*tree == NULL)
+    if (!(*tree))
         return;
-    
+
     if (binary != 0 && binary != 1)
     {
         perror("Error: in makeBinaryHide: value not binary\n");
@@ -71,10 +76,35 @@ void makeBinaryHide(Tree** tree, ListBinary* code, short binary)
         makeBinaryHide(&((*tree)->left), head, 0);
 
     if ((*tree)->right != NULL)
-        makeBinaryHide(&((*tree)->right), head, 1);   
+        makeBinaryHide(&((*tree)->right), head, 1);
 
-    //freeListBinary(head);
 }
+
+ListBinary* getBinaryCode(char* character, Tree* tree)
+{
+    if (!tree)
+      return NULL;
+
+    if (strcmp(character, &tree->character) == 0)
+      return tree->binary;
+
+    ListBinary* tmp = NULL;
+
+    if (tree->left)
+      tmp = getBinaryCode(character, tree->left);
+
+    if (tmp)
+        return tmp;
+
+    if (tree->right)
+      return getBinaryCode(character, tree->right);
+
+    return NULL;
+}
+
+/*------------------------------------------------*/
+/*------------------------------------------------*/
+/*------------------------------------------------*/
 
 /**
  * @brief Function to insert a new node in the Tree*
@@ -90,7 +120,7 @@ Tree* mergeTree(Tree* t1, Tree* t2){
         exit(1);
     }
 
-    tree->character = '+';
+    tree->character = '+';      //DEBUG CHARACTER TEMPO !!!!!!!!!!!!
     tree->occurence = 0;
 
     if (t1->occurence < t2->occurence)
@@ -113,9 +143,9 @@ Tree* mergeTree(Tree* t1, Tree* t2){
 
 /**
  * @brief Get the node with minimun occurences
- * 
- * @param tree 
- * @return Tree* 
+ *
+ * @param tree
+ * @return Tree*
  */
 Tree* minTree(Tree* tree){
 
@@ -130,9 +160,9 @@ Tree* minTree(Tree* tree){
 
 /**
  * @brief Get the node with maximun occurences
- * 
- * @param tree 
- * @return Tree* 
+ *
+ * @param tree
+ * @return Tree*
  */
 Tree* maxTree(Tree* tree){
 
@@ -147,9 +177,9 @@ Tree* maxTree(Tree* tree){
 
 /**
  * @brief Get the previous node
- * 
- * @param tree 
- * @return Tree* 
+ *
+ * @param tree
+ * @return Tree*
  */
 Tree* previous(Tree* tree){
 
@@ -161,9 +191,9 @@ Tree* previous(Tree* tree){
 
 /**
  * @brief Get the next node
- * 
- * @param tree 
- * @return Tree* 
+ *
+ * @param tree
+ * @return Tree*
  */
 Tree* next(Tree* tree){
 
@@ -195,8 +225,8 @@ int depth(Tree* tree){
 
 /**
  * @brief Print a tree leaf in prefix mode
- * 
- * @param tree 
+ *
+ * @param tree
  */
 void printPrefixTree(Tree* tree){
 
@@ -222,14 +252,14 @@ void printInfixTree(Tree* tree){
         if (tree->left)
             printInfixTree(tree->left);
 
-          
+
         if (!tree->left && !tree->right)
         {
             printf("Character: %c, Occurence: %d  ", tree->character, tree->occurence);
             printListBinary(tree->binary);
             printf("\n");
         }
-        
+
         if (tree->right)
             printInfixTree(tree->right);
 
@@ -245,8 +275,8 @@ void printRootTree(Tree* tree)
 
 /**
  * @brief Print a tree leaf in postfix mode
- * 
- * @param tree 
+ *
+ * @param tree
  */
 void printPostfixTree(Tree* tree){
 
@@ -269,8 +299,8 @@ void printPostfixTree(Tree* tree){
 
 /**
  * @brief Free a tree
- * 
- * @param tree 
+ *
+ * @param tree
  */
 void freeTree(Tree* tree){
 
@@ -285,6 +315,6 @@ void freeTree(Tree* tree){
 
     if(tree->binary)
         freeListBinary(tree->binary);
-    
+
     free(tree);
 }

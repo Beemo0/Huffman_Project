@@ -6,11 +6,11 @@
 
 List* addToList(List* list, char character)
 {
-    if (list == NULL)
+    if (!list)
     {
         list = (List*)malloc(sizeof(List));
         if (!list){
-            perror("Error: Allocation");
+            perror("Error: Allocation in addToList");
             exit(1);
         }
 
@@ -23,9 +23,9 @@ List* addToList(List* list, char character)
         /*Search for the character in the List*/
         List* tmp1 = list;
 
-        while (tmp1 != NULL)
+        while (tmp1)
         {
-            if (tmp1->tree != NULL)
+            if (tmp1->tree)
             {
                 if (character == tmp1->tree->character)
                 {
@@ -55,11 +55,11 @@ List* addToList(List* list, char character)
 
 List* insertList(List* list, Tree* tree)
 {
-    if (list == NULL)
+    if (!list)
     {
         list = (List*)malloc(sizeof(List));
         if (!list){
-            perror("Error: Allocation");
+            perror("Error: Allocation in insertList");
             exit(1);
         }
 
@@ -72,7 +72,7 @@ List* insertList(List* list, Tree* tree)
         List* tmp = NULL;
         tmp = (List*)malloc(sizeof(List));
         if (!tmp){
-            printf("Error: Allocation");
+            printf("Error: Allocation in insertList");
             exit(1);
         }
 
@@ -116,7 +116,7 @@ List* fSort(List* list)
 List* fSortHide(List* list)
 {
     /*If the current or next node is null: stop*/
-    if(list == NULL || list->next == NULL)
+    if(!list || !list->next)
         return list;
     
     /*Else Divide and Conquer*/
@@ -141,10 +141,10 @@ List* fSortHide(List* list)
  */
 List* mergeList(List* n1, List* n2) {
 
-    if(n1 == NULL)      //If n1 is empty return the other list
+    if(!n1)      //If n1 is empty return the other list
         return n2;
     
-    if(n2 == NULL)      //If n2 is empty return the other list
+    if(!n2)      //If n2 is empty return the other list
         return n1;
 
     List* head = NULL;
@@ -178,10 +178,10 @@ void splitList(List* list, List** n1, List** n2)
     right = list->next; 
 
 	/*Get left to the middle point of list*/
-	while (right != NULL)
+	while (right)
     { 
 		right = right->next;
-		if (right != NULL)
+		if (right)
         { 
 			left = left->next; 
 			right = right->next; 
@@ -205,14 +205,14 @@ void splitList(List* list, List** n1, List** n2)
 void createHuffmanTree(List** list){
 
     /*If the list is empty*/
-    if (*list == NULL)
+    if (!(*list))
         return;
     
     List* n1 = NULL;
     List* n2 = NULL;
 
     /*While the list doesn't content only one element*/
-    while ((*list) != NULL && (*list)->next != NULL)
+    while ((*list) && (*list)->next)
     {   
         /*Sort the List*/
         (*list) = fSort((*list));
@@ -274,7 +274,7 @@ void printList(List* list){
  */
 void freeList(List* list){
 
-    if (list == NULL)
+    if (!list)
         return;
 
     freeList(list->next);
@@ -289,7 +289,7 @@ void freeList(List* list){
  */
 void popList(List** list){
 
-    if (list == NULL)
+    if (!list)
         return;
     
     List* tmp = *list;
