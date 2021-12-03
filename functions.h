@@ -35,7 +35,7 @@ Node* MergeSort(Node* node);
 
 /* ---------- Compressing ---------- */
 
-Node* FillList(Node* node, char* filename);
+Node* FillList(Node* node, FILE* inFile);
 
 void AddChar(Node* node, char name);
 
