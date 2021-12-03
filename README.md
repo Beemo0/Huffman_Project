@@ -5,9 +5,9 @@ First project of 2021 - 2022
 make
 
 # Usage 
-Compression 	: ./exe -c source destination 
+Compression 	: ./exe -c file_source file_destination 
   
-Decompression 	: ./exe -d source destination  
+Decompression 	: ./exe -d file_source file_destination  
   
 Help			: ./exe -h
 
