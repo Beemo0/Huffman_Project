@@ -12,7 +12,7 @@ Decompression 	: ./exe -d file_source file_destination
 Help			: ./exe -h
 
 # Made by 
-Corentin Stefan  
+Corentin Stéphan 
   
 Evan Clausse  
   
