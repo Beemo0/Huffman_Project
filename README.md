@@ -5,11 +5,11 @@ First project of 2021 - 2022
 make
 
 # Usage 
-Compression 	: ./exe -c <source file> <destination file>
-Decompression 	: ./exe -d <source file> <destination file>
+Compression 	: ./exe -c <source file> <destination file> <br />
+Decompression 	: ./exe -d <source file> <destination file> <br />
 Help			: ./exe -h
 
 # Made by 
-Corentin Stefan
-Evan Clausse
+Corentin Stefan <br />
+Evan Clausse <br />
 Titouan Charrier
