@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
  		} else printf("Bad arguments use -h for help\n");
 
 	} else if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'h') {
-		printf("Usage : \n\n-c <your file> to compress \n-d <your file.hcf> to decompress \n-h to print this help\n");
+		printf("Usage : \n\n Compress   : -c <your file> <target> \n Decompress : -d <your compressed file> <target> \n Help       : -h to print this help\n");
 		return 0;
 		
 	} else {
