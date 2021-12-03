@@ -2,98 +2,110 @@
 
 int main(int argc, char *argv[]) {
 
-	int mod = 0;
+	//Choose task to do : 0 nothing / 1 compress / 2 decompress
+	int mod = 0; 
+
+/* ---------- Arguments management --------- */
 
 	char* filesubj;
+	char* filedest;
 
-	char filedest_v[128];
-	char* filedest = filedest_v;
-
-	if(argc>=2) {
+	if(argc == 4 && argv[1][0] == '-') {
  		
- 		if (argv[1][1] == 'c' && argv[2] != NULL) {
+ 		if (argv[1][1] == 'c' && argv[2] != NULL && argv[3] != NULL) {
  			
  			filesubj = argv[2];
- 			int lenght = strlen(filesubj);
- 			for (int i=0; i<lenght-4; i++) {
- 				filedest[i] = filesubj[i];
- 			}
- 			strcat(filedest,".hcf");
+ 			filedest = argv[3];
  			printf("File to compress : %s, Destination : %s\n\n", filesubj, filedest);
  			mod = 1;
  		}
 
- 		else if (argv[1][1] == 'd' && argv[2] != NULL) {
+ 		else if (argv[1][1] == 'd' &&  argv[2] != NULL && argv[3] != NULL) {
  			
  			filesubj = argv[2];
- 			int lenght = strlen(filesubj);
-
- 			if (filesubj[lenght-1] != 'f' || filesubj[lenght-2] != 'c' || filesubj[lenght-3] != 'h') {
- 				printf("Error : Bad filename, please enter a '.hcf' file\n");
- 				exit(1);
- 			}
-
- 			for (int i=0; i<lenght-4; i++) {
- 				filedest[i] = filesubj[i];
- 			}
- 			strcat(filedest,".txt");
+ 			filedest = argv[3];
  			printf("File to decompress : %s, Destination : %s\n\n", filesubj, filedest);
  			mod = 2;
  			
- 			
- 		}
- 		else if (argv[1][1] == 'h') {
-			printf("Usage : \n\n-c <your file> to compress \n-d <your file.hcf> to decompress \n-h to print this help\n");
-			return 0;
+ 		} else printf("Bad arguments use -h for help\n");
+
+	} else if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'h') {
+		printf("Usage : \n\n-c <your file> to compress \n-d <your file.hcf> to decompress \n-h to print this help\n");
+		return 0;
 		
-		} else printf("Bad arguments use -h for help\n");
+	} else {
+		printf("Bad arguments use -h for help\n");
+		return 0;
+	}
 
-
-
-	} else printf("Bad arguments use -h for help\n");
-
-/* ---------- Compressing --------- */
+/* ---------- Compressing ---------- */
 	if (mod == 1) {
+
+		// ----- Vars -----
 
 		clock_t start_t, end_t;
 		start_t = clock();
 
-		Node node_v;
-		Node* node = &node_v;
-
 		int totalChar = 0;
 
-		node = FillList(node, filesubj);
+		Node node_v;
+		Node* node = &node_v;
 
 		Table* table = NULL;
 		Table** table_p = &table;
 
-		node = MergeSort(node);
-		//printNode(node);
+		Code* buffer = NULL;
 
 		FILE* outFile = fopen(filedest, "w");
 		FILE* inFile = fopen(filesubj, "r");
+		
+		// ----- Errors -----
+
 		if (!inFile || !outFile) {
 			printf("Error : File not found\n");
 			exit(1);
+		} 
+
+		char lonelyChar = fgetc(inFile);
+		lonelyChar = fgetc(inFile);
+
+		if (lonelyChar == EOF) {
+			printf("Error : Can't compress empty / 1 char file\n");
+			exit(1);
 		}
+
+		fseek(inFile, 0, SEEK_SET);
+
+		// ----- Read file -----
+
+		node = FillList(node, inFile);
+		
+		fseek(inFile, 0, SEEK_SET);
+
+		// ----- Sort -----
+
+		node = MergeSort(node);
+		//printNode(node);
+
+		// ----- Head -----
 
 		fprintNode(node, outFile);
 
+		// ----- Tree -----
+
 		node = MakeTree(node);
-		//printNode(node);
+		//treeprint(node, 5);
 
 		totalChar = node->box.freq;
 
-		Code* buffer = NULL;
-
-		//treeprint(node, 5);
-
 		ReadTree(node, buffer, table_p);
-
 		//printTable(table);
 
+		// ----- Replacing -----
+
 		ReplaceText(inFile, outFile, table, totalChar);
+
+		// ----- Ending -----
 
 		fclose(inFile);
 		fclose(outFile);
@@ -161,8 +173,10 @@ int main(int argc, char *argv[]) {
 
 		remove("buffer");
 
-		end_t = clock();
+		
 		fputs("\033[A\033[2K",stdout);
+
+		end_t = clock();
 		printf("Decompression done :%g s\n",(double)(end_t - start_t)/CLOCKS_PER_SEC);
 
 		//printCodeList(binList);

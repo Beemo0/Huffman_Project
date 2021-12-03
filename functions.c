@@ -31,7 +31,7 @@ void printTable(Table* table)
 }
 
 /**
- * @brief Print a code
+ * @brief Print a list of type Code
  * 
  * @param codeList 
  */
@@ -284,17 +284,15 @@ void delay(int milli_seconds)
  * @param filename 
  * @return Node* 
  */
-Node* FillList(Node* node, char* filename) 
+Node* FillList(Node* node, FILE* inFile) 
 {
-	FILE* file = NULL;
-	file = fopen(filename,"r");
 
-	if (file) {
+	if (inFile) {
 
-		fseek(file,0,SEEK_SET); //set cursor to the beginning
+		fseek(inFile,0,SEEK_SET); //set cursor to the beginning
 
 		char buffer;
-		buffer = fgetc(file); //get the first char
+		buffer = fgetc(inFile); //get the first char
 
 		/*Initialise a node*/
 		node->box.name = buffer;
@@ -306,10 +304,8 @@ Node* FillList(Node* node, char* filename)
 
 		while(buffer != EOF){
 			AddChar(node, buffer);
-			buffer = fgetc(file);
+			buffer = fgetc(inFile);
 		}
-
-		fclose(file);
 
 		return node;
 
@@ -334,7 +330,7 @@ void AddChar(Node* node, char name)
 		else {
 			if (!node->next) 
 			{
-				Node* new = malloc(sizeof *new);
+				Node* new = calloc(1, sizeof *new);
 
 				if (!node || !new) exit(EXIT_FAILURE);
 
@@ -375,7 +371,7 @@ Node* MakeTree(Node* node)
 
 	node = MergeSort(node);
 
-	Node* new = malloc(sizeof(*new));
+	Node* new = calloc(1, sizeof *new);
 
 	if (!node || !new) exit(EXIT_FAILURE);
 
@@ -384,9 +380,6 @@ Node* MakeTree(Node* node)
 	new->isLeaf = 0;
 	new->left = node;
 	new->right = node->next;
-
-	node->next->next = NULL;
-	node->next = NULL;
 
 	return MakeTree(new);
 }
@@ -470,7 +463,7 @@ Code* AddIntToBuffer(Code* buffer, Code* root, uint8_t value)
 {
 	if (!buffer) 
 	{
-		Code* new = malloc(sizeof(*new));
+		Code* new = calloc(1, sizeof(*new));
 		new->code = value;
 		new->next = NULL;
 		return new;
@@ -482,7 +475,7 @@ Code* AddIntToBuffer(Code* buffer, Code* root, uint8_t value)
 		return buffer;
 
 	} else {
-		Code* new = malloc(sizeof(*new));
+		Code* new = calloc(1, sizeof(*new));
 		new->code = value;
 		new->next = NULL;
 		buffer->next = new;
@@ -500,7 +493,7 @@ Code* AddIntToBuffer(Code* buffer, Code* root, uint8_t value)
  */
 Table* AddCharTable(Table* table, char name, Code* code) 
 {
-	Table* new = malloc(sizeof(*new));
+	Table* new = calloc(1, sizeof(*new));
 
 	new->name = name;
 	new->listcode = code;
@@ -531,7 +524,7 @@ void ReplaceText(FILE* inFile, FILE* outFile, Table* table, int totalChar)
 
 	Code* codeList = NULL;
 
-	ByteList* bList = malloc(sizeof(*bList));
+	ByteList* bList = calloc(1, sizeof(*bList));
 
 	bList->count = 0;
 	bList->Byt = 0;
@@ -543,14 +536,13 @@ void ReplaceText(FILE* inFile, FILE* outFile, Table* table, int totalChar)
 		Bytify(bList, codeList, countByte);
 		charbuffer = fgetc(inFile);
 
-		if (countLoop % (totalChar / 100) == 0) 
+		if (totalChar >= 100 && countLoop % (totalChar / 100) == 0) 
 		{
 			fputs("\033[A\033[2K",stdout);
 			printf("Compressing [ %d% ]\n", percent);
 			percent += 1;
 		}
 		countLoop += 1;
-
 	}
 
 	fprintf(outFile, "$%d $$ ", *countByte);
@@ -579,7 +571,7 @@ void Bytify(ByteList* bList, Code* codeList, int* countByte)
 	} else if (!bList->next) 
 	{
 		*countByte += 1;
-		ByteList* new = malloc(sizeof(*new));
+		ByteList* new = calloc(1, sizeof(*new));
 
 		new->count = 1;
 		new->Byt = BitAdd(bList->Byt, codeList->code);
@@ -662,7 +654,7 @@ Node* fscanNode(FILE* inFile, int* countByte)
 	{
 		charbuffer = fgetc(inFile);
 
-		Node* new = malloc(sizeof(*new));
+		Node* new = calloc(1, sizeof(*new));
 		new->next = oldNode;
 		new->isLeaf = 1;
 		new->box.name = charbuffer;
